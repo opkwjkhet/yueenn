@@ -1,4 +1,3 @@
-
 ARCHS = arm64
 TARGET = iphone:latest
 DEBUG = 0
@@ -30,17 +29,23 @@ IMGUI/imgui_impl_metal.mm \
 hook/hook.c \
 hook/mach_excServer.c
 
+# ✅ CFLAGS — เพิ่ม -Wno-error เข้าไป!
 VIGAR_CFLAGS = -fobjc-arc \
 -Wall \
+-Wno-error \
 -Wno-deprecated-declarations \
 -Wno-unused-variable \
 -Wno-unused-value \
 -Wno-unused-function \
+-Wno-uninitialized-const-pointer \
 -fvisibility=hidden
 
+# ✅ CCFLAGS — เพิ่ม -Wno-error เข้าไป!
 VIGAR_CCFLAGS = -std=c++17 \
 -fno-rtti \
 -DNDEBUG \
+-Wno-error \
+-Wno-uninitialized-const-pointer \
 -fvisibility=hidden
 
 VIGAR_FRAMEWORKS = \
@@ -58,7 +63,7 @@ GameController \
 Metal \
 MetalKit
 
-
-VIGAR_LDFLAGS += JRMemory.framework/JRMemory
+# ✅ LDFLAGS — แก้ให้ถูกต้อง (ใช้ -F และ -framework)
+VIGAR_LDFLAGS += -F$(PWD)/JRMemory.framework -framework JRMemory
 
 include $(THEOS)/makefiles/tweak.mk
