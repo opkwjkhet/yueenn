@@ -1,10 +1,6 @@
-export THEOS=/var/theos
-export CC=ccache gcc
-export CXX=ccache g++
 
 ARCHS = arm64
-TARGET = iphone:clang:latest:15.0
-
+TARGET = iphone:latest
 DEBUG = 0
 FINALPACKAGE = 1
 FOR_RELEASE = 1
