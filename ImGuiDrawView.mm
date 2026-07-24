@@ -275,42 +275,35 @@ bool antiban(void* instance) {
 
 - (void)undergroundModeUI {
     if (self.undergroundButtonView) return;
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
 
-    UIWindow *mainWindow = [UIApplication sharedApplication].keyWindow;
+    // iOS 15-style: UIButtonTypeCustom, solid dark background, no glass
+    self.undergroundButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.undergroundButtonView.frame = CGRectMake(305, 300, 64, 54);
+    self.undergroundButtonView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
+    self.undergroundButtonView.layer.cornerRadius = 10;
+    self.undergroundButtonView.layer.borderWidth = 1.0f;
+    self.undergroundButtonView.layer.borderColor = [UIColor colorWithWhite:0.35f alpha:1.0f].CGColor;
+    self.undergroundButtonView.clipsToBounds = YES;
+    [self.undergroundButtonView addTarget:self action:@selector(wasDragged:withEvent:)
+                         forControlEvents:UIControlEventTouchDragInside];
+    [win addSubview:self.undergroundButtonView];
 
-    self.undergroundButtonView = [[UIButton alloc] initWithFrame:CGRectMake(305, 300, 58, 54)];
-    self.undergroundButtonView.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    self.undergroundButtonView.alpha = 1.0f;
-    self.undergroundButtonView.layer.borderColor = [[UIColor clearColor] CGColor];
-    self.undergroundButtonView.layer.borderWidth = 1.5f;
-    self.undergroundButtonView.layer.cornerRadius = 8;
-    self.undergroundButtonView.layer.shadowOpacity = 0;
-    self.undergroundButtonView.layer.shadowColor = [UIColor clearColor].CGColor;
-    self.undergroundButtonView.layer.shadowRadius = 0;
-
-    [self.undergroundButtonView addTarget:self action:@selector(wasDragged:withEvent:) forControlEvents:UIControlEventTouchDragInside];
-    [mainWindow addSubview:self.undergroundButtonView];
-
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(7, 1, 72, 20.8)];
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont fontWithName:@"CourierNewPS-BoldMT" size:10];
-    label.numberOfLines = 1;
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, 64, 18)];
+    label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
+    label.font = [UIFont boldSystemFontOfSize:9];
+    label.textAlignment = NSTextAlignmentCenter;
     label.text = @"UNDER";
-    label.shadowColor = [UIColor clearColor];
-    label.shadowOffset = CGSizeMake(1.1, 1.1);
     label.backgroundColor = [UIColor clearColor];
-    label.tag = 1001;
     [self.undergroundButtonView addSubview:label];
 
-    self.undergroundSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(3.5, 20, 51, 31)];
-    self.undergroundSwitch.layer.borderWidth = 2.5;
-    self.undergroundSwitch.layer.cornerRadius = 8;
-    self.undergroundSwitch.layer.borderColor = [UIColor clearColor].CGColor;
-    self.undergroundSwitch.transform = CGAffineTransformMakeScale(1.00, 1.00);
-    self.undergroundSwitch.backgroundColor = [UIColor clearColor];
+    self.undergroundSwitch = [[UISwitch alloc] init];
+    self.undergroundSwitch.transform = CGAffineTransformMakeScale(0.72f, 0.72f);
+    self.undergroundSwitch.center = CGPointMake(32, 38);
+    self.undergroundSwitch.onTintColor = [UIColor colorWithRed:0.94f green:0.12f blue:0.12f alpha:1.0f];
     self.undergroundSwitch.thumbTintColor = [UIColor whiteColor];
-    self.undergroundSwitch.onTintColor = [UIColor redColor];
-    [self.undergroundSwitch addTarget:self action:@selector(undergroundSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.undergroundSwitch addTarget:self action:@selector(undergroundSwitchChanged:)
+                     forControlEvents:UIControlEventValueChanged];
     [self.undergroundButtonView addSubview:self.undergroundSwitch];
 }
 
@@ -334,49 +327,34 @@ bool antiban(void* instance) {
 
 - (void)blamybanModeUI {
     if (self.blamybanButtonView) return;
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
 
-    UIWindow *mainWindow = [UIApplication sharedApplication].keyWindow;
-
-    self.blamybanButtonView = [[UIButton alloc] initWithFrame:CGRectMake(370, 300, 58, 54)];
-    self.blamybanButtonView.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    self.blamybanButtonView.alpha = 1.0f;
-    self.blamybanButtonView.layer.borderColor = [UIColor clearColor].CGColor;
-    self.blamybanButtonView.layer.borderWidth = 1.5f;
-    self.blamybanButtonView.layer.cornerRadius = 8;
-    self.blamybanButtonView.layer.shadowOpacity = 0;
-    self.blamybanButtonView.layer.shadowColor = [UIColor clearColor].CGColor;
-    self.blamybanButtonView.layer.shadowRadius = 0;
-
-    // reuse your drag handler
-    [self.blamybanButtonView addTarget:self
-                                action:@selector(wasDragged:withEvent:)
+    self.blamybanButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.blamybanButtonView.frame = CGRectMake(375, 300, 64, 54);
+    self.blamybanButtonView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
+    self.blamybanButtonView.layer.cornerRadius = 10;
+    self.blamybanButtonView.layer.borderWidth = 1.0f;
+    self.blamybanButtonView.layer.borderColor = [UIColor colorWithWhite:0.35f alpha:1.0f].CGColor;
+    self.blamybanButtonView.clipsToBounds = YES;
+    [self.blamybanButtonView addTarget:self action:@selector(wasDragged:withEvent:)
                       forControlEvents:UIControlEventTouchDragInside];
+    [win addSubview:self.blamybanButtonView];
 
-    [mainWindow addSubview:self.blamybanButtonView];
-
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(7, 1, 72, 20.8)];
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont fontWithName:@"CourierNewPS-BoldMT" size:10];
-    label.numberOfLines = 1;
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, 64, 18)];
+    label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
+    label.font = [UIFont boldSystemFontOfSize:9];
+    label.textAlignment = NSTextAlignmentCenter;
     label.text = @"F-UNDER";
-    label.shadowColor = [UIColor clearColor];
-    label.shadowOffset = CGSizeMake(1.1, 1.1);
     label.backgroundColor = [UIColor clearColor];
-    label.tag = 2101;
     [self.blamybanButtonView addSubview:label];
 
-    self.blamybanSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(3.5, 20, 51, 31)];
-    self.blamybanSwitch.layer.borderWidth = 2.5;
-    self.blamybanSwitch.layer.cornerRadius = 8;
-    self.blamybanSwitch.layer.borderColor = [UIColor clearColor].CGColor;
-    self.blamybanSwitch.transform = CGAffineTransformMakeScale(1.00, 1.00);
-    self.blamybanSwitch.backgroundColor = [UIColor clearColor];
+    self.blamybanSwitch = [[UISwitch alloc] init];
+    self.blamybanSwitch.transform = CGAffineTransformMakeScale(0.72f, 0.72f);
+    self.blamybanSwitch.center = CGPointMake(32, 38);
+    self.blamybanSwitch.onTintColor = [UIColor colorWithRed:0.94f green:0.12f blue:0.12f alpha:1.0f];
     self.blamybanSwitch.thumbTintColor = [UIColor whiteColor];
-    self.blamybanSwitch.onTintColor = [UIColor magentaColor];
-    [self.blamybanSwitch addTarget:self
-                            action:@selector(blamybanSwitchChanged:)
+    [self.blamybanSwitch addTarget:self action:@selector(blamybanSwitchChanged:)
                   forControlEvents:UIControlEventValueChanged];
-
     [self.blamybanButtonView addSubview:self.blamybanSwitch];
 }
 
@@ -453,49 +431,35 @@ bool antiban(void* instance) {
 
 - (void)telekillModeUI {
     if (self.telekillButtonView) return;
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
 
-    UIWindow *mainWindow = [UIApplication sharedApplication].keyWindow;
+    self.telekillButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.telekillButtonView.frame = CGRectMake(305, 360, 64, 54);
+    self.telekillButtonView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
+    self.telekillButtonView.layer.cornerRadius = 10;
+    self.telekillButtonView.layer.borderWidth = 1.0f;
+    self.telekillButtonView.layer.borderColor = [UIColor colorWithWhite:0.35f alpha:1.0f].CGColor;
+    self.telekillButtonView.clipsToBounds = YES;
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]
+        initWithTarget:self action:@selector(handleTelekillDrag:)];
+    [self.telekillButtonView addGestureRecognizer:pan];
+    [win addSubview:self.telekillButtonView];
 
-    self.telekillButtonView = [[UIButton alloc] initWithFrame:CGRectMake(305, 330, 58, 54)];
-    self.telekillButtonView.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    self.telekillButtonView.alpha = 1.0f;
-
-    // تعديل حدود الزر لتكون مشابهة لزر الـ Ghost
-    self.telekillButtonView.layer.borderColor = [[UIColor clearColor] CGColor];
-    self.telekillButtonView.layer.borderWidth = 1.5f;
-    self.telekillButtonView.layer.cornerRadius = 13;
-    self.telekillButtonView.layer.shadowOpacity = 0;
-    self.telekillButtonView.layer.shadowColor = [UIColor clearColor].CGColor;
-    self.telekillButtonView.layer.shadowRadius = 0;
-
-    // إضافة إمكانية سحب الزر (Drag)
-    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTelekillDrag:)];
-    [self.telekillButtonView addGestureRecognizer:panGesture];
-
-    [mainWindow addSubview:self.telekillButtonView];
-
-    // إعداد عنوان الزر (Label)
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(7, 1, 72, 20.8)];
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont fontWithName:@"CourierNewPS-BoldMT" size:10];
-    label.numberOfLines = 1;
-    label.text = @"Tele";
-    label.shadowColor = [UIColor clearColor];
-    label.shadowOffset = CGSizeMake(1.1, 1.1);
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, 64, 18)];
+    label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
+    label.font = [UIFont boldSystemFontOfSize:9];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.text = @"TELE";
     label.backgroundColor = [UIColor clearColor];
-    label.tag = 1001;
     [self.telekillButtonView addSubview:label];
 
-    // إعداد مفتاح التفعيل (UISwitch)
-    self.telekillSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(3.5, 20, 51, 31)];
-    self.telekillSwitch.layer.borderWidth = 2.5;
-    self.telekillSwitch.layer.cornerRadius = 9;
-    self.telekillSwitch.layer.borderColor = [UIColor clearColor].CGColor;
-    self.telekillSwitch.transform = CGAffineTransformMakeScale(1.00, 1.00);
-    self.telekillSwitch.backgroundColor = [UIColor clearColor];
+    self.telekillSwitch = [[UISwitch alloc] init];
+    self.telekillSwitch.transform = CGAffineTransformMakeScale(0.72f, 0.72f);
+    self.telekillSwitch.center = CGPointMake(32, 38);
+    self.telekillSwitch.onTintColor = [UIColor colorWithRed:0.94f green:0.12f blue:0.12f alpha:1.0f];
     self.telekillSwitch.thumbTintColor = [UIColor whiteColor];
-    self.telekillSwitch.onTintColor = [UIColor blackColor];
-    [self.telekillSwitch addTarget:self action:@selector(telekillSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.telekillSwitch addTarget:self action:@selector(telekillSwitchChanged:)
+                  forControlEvents:UIControlEventValueChanged];
     [self.telekillButtonView addSubview:self.telekillSwitch];
 }
 
@@ -527,49 +491,35 @@ bool antiban(void* instance) {
 
 - (void)faketelekillModeUI {
     if (self.faketelekillButtonView) return;
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
 
-    UIWindow *mainWindow = [UIApplication sharedApplication].keyWindow;
+    self.faketelekillButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.faketelekillButtonView.frame = CGRectMake(375, 360, 64, 54);
+    self.faketelekillButtonView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
+    self.faketelekillButtonView.layer.cornerRadius = 10;
+    self.faketelekillButtonView.layer.borderWidth = 1.0f;
+    self.faketelekillButtonView.layer.borderColor = [UIColor colorWithWhite:0.35f alpha:1.0f].CGColor;
+    self.faketelekillButtonView.clipsToBounds = YES;
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]
+        initWithTarget:self action:@selector(handlefakeTelekillDrag:)];
+    [self.faketelekillButtonView addGestureRecognizer:pan];
+    [win addSubview:self.faketelekillButtonView];
 
-    self.faketelekillButtonView = [[UIButton alloc] initWithFrame:CGRectMake(305, 330, 58, 54)];
-    self.faketelekillButtonView.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    self.faketelekillButtonView.alpha = 1.0f;
-
-    // تعديل حدود الزر لتكون مشابهة لزر الـ Ghost
-    self.faketelekillButtonView.layer.borderColor = [[UIColor clearColor] CGColor];
-    self.faketelekillButtonView.layer.borderWidth = 1.5f;
-    self.faketelekillButtonView.layer.cornerRadius = 13;
-    self.faketelekillButtonView.layer.shadowOpacity = 0;
-    self.faketelekillButtonView.layer.shadowColor = [UIColor clearColor].CGColor;
-    self.faketelekillButtonView.layer.shadowRadius = 0;
-
-    // إضافة إمكانية سحب الزر (Drag)
-    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlefakeTelekillDrag:)];
-    [self.faketelekillButtonView addGestureRecognizer:panGesture];
-
-    [mainWindow addSubview:self.faketelekillButtonView];
-
-    // إعداد عنوان الزر (Label)
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(7, 1, 72, 20.8)];
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont fontWithName:@"CourierNewPS-BoldMT" size:10];
-    label.numberOfLines = 1;
-    label.text = @"F-Tele";
-    label.shadowColor = [UIColor clearColor];
-    label.shadowOffset = CGSizeMake(1.1, 1.1);
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, 64, 18)];
+    label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
+    label.font = [UIFont boldSystemFontOfSize:9];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.text = @"F-TELE";
     label.backgroundColor = [UIColor clearColor];
-    label.tag = 1001;
     [self.faketelekillButtonView addSubview:label];
 
-    // إعداد مفتاح التفعيل (UISwitch)
-    self.faketelekillSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(3.5, 20, 51, 31)];
-    self.faketelekillSwitch.layer.borderWidth = 2.5;
-    self.faketelekillSwitch.layer.cornerRadius = 9;
-    self.faketelekillSwitch.layer.borderColor = [UIColor clearColor].CGColor;
-    self.faketelekillSwitch.transform = CGAffineTransformMakeScale(1.00, 1.00);
-    self.faketelekillSwitch.backgroundColor = [UIColor clearColor];
+    self.faketelekillSwitch = [[UISwitch alloc] init];
+    self.faketelekillSwitch.transform = CGAffineTransformMakeScale(0.72f, 0.72f);
+    self.faketelekillSwitch.center = CGPointMake(32, 38);
+    self.faketelekillSwitch.onTintColor = [UIColor colorWithRed:0.94f green:0.12f blue:0.12f alpha:1.0f];
     self.faketelekillSwitch.thumbTintColor = [UIColor whiteColor];
-    self.faketelekillSwitch.onTintColor = [UIColor magentaColor];
-    [self.faketelekillSwitch addTarget:self action:@selector(faketelekillSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.faketelekillSwitch addTarget:self action:@selector(faketelekillSwitchChanged:)
+                      forControlEvents:UIControlEventValueChanged];
     [self.faketelekillButtonView addSubview:self.faketelekillSwitch];
 }
 
@@ -604,49 +554,35 @@ bool antiban(void* instance) {
 
 - (void)ninjaRunModeUI {
     if (self.ninjarunButtonView) return;
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
 
-    UIWindow *mainWindow = [UIApplication sharedApplication].keyWindow;
+    self.ninjarunButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.ninjarunButtonView.frame = CGRectMake(375, 360, 64, 54);
+    self.ninjarunButtonView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
+    self.ninjarunButtonView.layer.cornerRadius = 10;
+    self.ninjarunButtonView.layer.borderWidth = 1.0f;
+    self.ninjarunButtonView.layer.borderColor = [UIColor colorWithWhite:0.35f alpha:1.0f].CGColor;
+    self.ninjarunButtonView.clipsToBounds = YES;
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]
+        initWithTarget:self action:@selector(handleninjaDrag:)];
+    [self.ninjarunButtonView addGestureRecognizer:pan];
+    [win addSubview:self.ninjarunButtonView];
 
-    self.ninjarunButtonView = [[UIButton alloc] initWithFrame:CGRectMake(305, 330, 58, 54)];
-    self.ninjarunButtonView.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    self.ninjarunButtonView.alpha = 1.0f;
-
-    // تعديل حدود الزر لتكون مشابهة لزر الـ Ghost
-    self.ninjarunButtonView.layer.borderColor = [[UIColor clearColor] CGColor];
-    self.ninjarunButtonView.layer.borderWidth = 1.5f;
-    self.ninjarunButtonView.layer.cornerRadius = 8;
-    self.ninjarunButtonView.layer.shadowOpacity = 0;
-    self.ninjarunButtonView.layer.shadowColor = [UIColor clearColor].CGColor;
-    self.ninjarunButtonView.layer.shadowRadius = 0;
-
-    // إضافة إمكانية سحب الزر (Drag)
-    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleninjaDrag:)];
-    [self.ninjarunButtonView addGestureRecognizer:panGesture];
-
-    [mainWindow addSubview:self.ninjarunButtonView];
-
-    // إعداد عنوان الزر (Label)
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(7, 1, 72, 20.8)];
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont fontWithName:@"CourierNewPS-BoldMT" size:10];
-    label.numberOfLines = 1;
-    label.text = @"Ninja";
-    label.shadowColor = [UIColor clearColor];
-    label.shadowOffset = CGSizeMake(1.1, 1.1);
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, 64, 18)];
+    label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
+    label.font = [UIFont boldSystemFontOfSize:9];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.text = @"NINJA";
     label.backgroundColor = [UIColor clearColor];
-    label.tag = 1001;
     [self.ninjarunButtonView addSubview:label];
 
-    // إعداد مفتاح التفعيل (UISwitch)
-    self.ninjaSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(3.5, 20, 51, 31)];
-    self.ninjaSwitch.layer.borderWidth = 2.5;
-    self.ninjaSwitch.layer.cornerRadius = 9;
-    self.ninjaSwitch.layer.borderColor = [UIColor clearColor].CGColor;
-    self.ninjaSwitch.transform = CGAffineTransformMakeScale(1.00, 1.00);
-    self.ninjaSwitch.backgroundColor = [UIColor clearColor];
+    self.ninjaSwitch = [[UISwitch alloc] init];
+    self.ninjaSwitch.transform = CGAffineTransformMakeScale(0.72f, 0.72f);
+    self.ninjaSwitch.center = CGPointMake(32, 38);
+    self.ninjaSwitch.onTintColor = [UIColor colorWithRed:0.94f green:0.12f blue:0.12f alpha:1.0f];
     self.ninjaSwitch.thumbTintColor = [UIColor whiteColor];
-    self.ninjaSwitch.onTintColor = [UIColor blueColor];
-    [self.ninjaSwitch addTarget:self action:@selector(ninjaSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.ninjaSwitch addTarget:self action:@selector(ninjaSwitchChanged:)
+              forControlEvents:UIControlEventValueChanged];
     [self.ninjarunButtonView addSubview:self.ninjaSwitch];
 }
 
@@ -685,55 +621,46 @@ bool antiban(void* instance) {
 
 - (void)ghostModeUI {
     if (self.ghostButtonView) return;
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
 
-    UIWindow *mainWindow = [UIApplication sharedApplication].keyWindow;
+    self.ghostButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.ghostButtonView.frame = CGRectMake(305, 244, 64, 54);
+    self.ghostButtonView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
+    self.ghostButtonView.layer.cornerRadius = 10;
+    self.ghostButtonView.layer.borderWidth = 1.0f;
+    self.ghostButtonView.layer.borderColor = [UIColor colorWithWhite:0.35f alpha:1.0f].CGColor;
+    self.ghostButtonView.clipsToBounds = YES;
+    [self.ghostButtonView addTarget:self action:@selector(wasDraggeGhostd:withEvent:)
+                   forControlEvents:UIControlEventTouchDragInside];
+    [win addSubview:self.ghostButtonView];
 
-    self.ghostButtonView = [[UIButton alloc] initWithFrame:CGRectMake(305, 265, 58, 54)];
-    self.ghostButtonView.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    self.ghostButtonView.alpha = 1.0f;
-    self.ghostButtonView.layer.borderColor = [[UIColor clearColor] CGColor];
-    self.ghostButtonView.layer.borderWidth = 1.5f;
-    self.ghostButtonView.layer.cornerRadius = 8;
-    self.ghostButtonView.layer.shadowOpacity = 0;
-    self.ghostButtonView.layer.shadowColor = [UIColor clearColor].CGColor;
-    self.ghostButtonView.layer.shadowRadius = 0;
-
-    [self.ghostButtonView addTarget:self action:@selector(wasDraggeGhostd:withEvent:) forControlEvents:UIControlEventTouchDragInside];
-    [mainWindow addSubview:self.ghostButtonView];
-
-    // عنوان Ghost
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(7, 1, 72, 20.8)];
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont fontWithName:@"CourierNewPS-BoldMT" size:10];
-    label.numberOfLines = 1;
-    label.text = @"Ghost";
-    label.shadowColor = [UIColor clearColor];
-    label.shadowOffset = CGSizeMake(1.1, 1.1);
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, 64, 18)];
+    label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
+    label.font = [UIFont boldSystemFontOfSize:9];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.text = @"GHOST";
     label.backgroundColor = [UIColor clearColor];
-    label.tag = 1001;
     [self.ghostButtonView addSubview:label];
 
-    // مفتاح التفعيل UISwitch
-    self.ghostSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(3.5, 20, 51, 31)];
-    self.ghostSwitch.layer.borderWidth = 2.5;
-    self.ghostSwitch.layer.cornerRadius = 11;
-    self.ghostSwitch.layer.borderColor = [UIColor clearColor].CGColor;
-    self.ghostSwitch.transform = CGAffineTransformMakeScale(1.00, 1.00);
-    self.ghostSwitch.backgroundColor = [UIColor clearColor];
+    self.ghostSwitch = [[UISwitch alloc] init];
+    self.ghostSwitch.transform = CGAffineTransformMakeScale(0.72f, 0.72f);
+    self.ghostSwitch.center = CGPointMake(32, 38);
+    self.ghostSwitch.onTintColor = [UIColor colorWithRed:0.94f green:0.12f blue:0.12f alpha:1.0f];
     self.ghostSwitch.thumbTintColor = [UIColor whiteColor];
-    self.ghostSwitch.onTintColor = [UIColor orangeColor];
-    [self.ghostSwitch addTarget:self action:@selector(ghostSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.ghostSwitch addTarget:self action:@selector(ghostSwitchChanged:)
+              forControlEvents:UIControlEventValueChanged];
     [self.ghostButtonView addSubview:self.ghostSwitch];
 
-    // ✅ عداد الثواني فوق الزر
-    self.ghostTimerLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.ghostButtonView.frame.origin.x, self.ghostButtonView.frame.origin.y - 25, 80, 20)];
+    // Timer label above button
+    self.ghostTimerLabel = [[UILabel alloc] initWithFrame:CGRectMake(
+        self.ghostButtonView.frame.origin.x,
+        self.ghostButtonView.frame.origin.y - 24, 64, 20)];
     self.ghostTimerLabel.text = @"1s";
     self.ghostTimerLabel.textAlignment = NSTextAlignmentCenter;
-    self.ghostTimerLabel.textColor = [UIColor greenColor];
-    self.ghostTimerLabel.font = [UIFont boldSystemFontOfSize:17];
-    self.ghostTimerLabel.tag = 2025;
-    self.ghostTimerLabel.hidden = YES; // تبدأ مخفية
-    [mainWindow addSubview:self.ghostTimerLabel];
+    self.ghostTimerLabel.textColor = [UIColor colorWithRed:0.20f green:0.90f blue:0.20f alpha:1.0f];
+    self.ghostTimerLabel.font = [UIFont boldSystemFontOfSize:15];
+    self.ghostTimerLabel.hidden = YES;
+    [win addSubview:self.ghostTimerLabel];
 }
 
 
@@ -898,50 +825,38 @@ bool antiban(void* instance) {
 
 - (void)ghost {
     mainWindow = [[UIApplication sharedApplication] keyWindow];
+    if (menuView) return;
 
+    menuView = [UIButton buttonWithType:UIButtonTypeCustom];
+    menuView.frame = CGRectMake(305, 185, 64, 64);
+    menuView.layer.cornerRadius = 32;
+    menuView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
+    menuView.layer.borderWidth = 1.5f;
+    menuView.layer.borderColor = [UIColor colorWithWhite:0.35f alpha:1.0f].CGColor;
+    menuView.clipsToBounds = YES;
+    [mainWindow addSubview:menuView];
 
+    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc]
+        initWithTarget:self action:@selector(handlePan:)];
+    [menuView addGestureRecognizer:panGesture];
 
-    if (!menuView) {
-        // Tạo menuView với nền tròn màu đen nhạt
-        menuView = [UIButton buttonWithType:UIButtonTypeCustom]; // Thay đổi ở đây
-        menuView.frame = CGRectMake(305, 265, 70, 70);
-        menuView.layer.cornerRadius = menuView.bounds.size.width / 2; // Hình tròn
-        menuView.backgroundColor = [[UIColor greenColor] colorWithAlphaComponent:0.6]; // Nền đen nhạt
-        menuView.alpha = 1.0f;
+    UILabel *aimLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 20, 64, 24)];
+    aimLabel.font = [UIFont boldSystemFontOfSize:11];
+    aimLabel.textAlignment = NSTextAlignmentCenter;
+    aimLabel.backgroundColor = [UIColor clearColor];
+    aimLabel.tag = 100;
+    aimLabel.text = @"Fake Lag";
+    aimLabel.textColor = [UIColor colorWithRed:0.94f green:0.12f blue:0.12f alpha:1.0f];
+    [menuView addSubview:aimLabel];
 
-        // Đảm bảo chỉ thêm vào cửa sổ chính một lần
-        [mainWindow addSubview:menuView];
+    UIButton *aimButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    aimButton.frame = CGRectMake(0, 0, 64, 64);
+    aimButton.backgroundColor = [UIColor clearColor];
+    [aimButton addTarget:self action:@selector(switchIsChanged:)
+       forControlEvents:UIControlEventTouchUpInside];
+    [menuView addSubview:aimButton];
 
-        // Thêm sự kiện kéo nút sử dụng UIPanGestureRecognizer
-        UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-        [menuView addGestureRecognizer:panGesture];
-
-        // Thêm nhãn cho trạng thái Aimbot
-        UILabel *aimLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 25, 70, 20)]; // Đặt đúng vị trí
-        aimLabel.font = [UIFont fontWithName:@"CoreAddition-Arial.ttf" size:12];
-        aimLabel.textAlignment = NSTextAlignmentCenter; // Canh giữa
-        aimLabel.backgroundColor = [UIColor clearColor]; // Không có nền
-        aimLabel.tag = 100; // Gán thẻ để truy xuất sau
-
-        // Thêm nhãn vào menuView
-        [menuView addSubview:aimLabel];
-
-        // Đặt văn bản cho nhãn
-        aimLabel.text = @"Fake Lag";
-        aimLabel.textColor = [UIColor redColor]; // Màu chữ bắt đầu là đỏ (tắt)
-
-        // Tạo nút để bật/tắt Aimbot
-        UIButton *aimButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        aimButton.frame = CGRectMake(0, 0, 100, 100); // Kích thước giống như menuView
-        aimButton.layer.cornerRadius = aimButton.bounds.size.width / 2; // Tạo hình tròn
-        aimButton.backgroundColor = [UIColor clearColor]; // Nền trong suốt
-        [aimButton addTarget:self action:@selector(switchIsChanged:) forControlEvents:UIControlEventTouchUpInside];
-
-        // Thêm nút vào menuView
-        [menuView addSubview:aimButton];
-
-        hasGhostBeenDrawn = YES; // Đánh dấu menu đã được vẽ
-    }
+    hasGhostBeenDrawn = YES;
 }
 
 
@@ -996,73 +911,74 @@ bool antiban(void* instance) {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGuiStyle& style = ImGui::GetStyle();
 
-// Color settings
-style.Colors[ImGuiCol_Text]                   = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
-style.Colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-style.Colors[ImGuiCol_WindowBg]               = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);  // أسود نصف شفاف
-style.Colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_PopupBg]                = ImVec4(0.08f, 0.00f, 0.00f, 0.90f);
-style.Colors[ImGuiCol_Border]                 = ImVec4(0.50f, 0.00f, 0.00f, 0.50f);
-style.Colors[ImGuiCol_BorderShadow]           = ImVec4(0.5f, 0.0f, 0.0f, 0.7f);
-style.Colors[ImGuiCol_FrameBg]                = ImVec4(0.20f, 0.00f, 0.00f, 0.54f);
-style.Colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.40f, 0.00f, 0.00f, 0.40f);
-style.Colors[ImGuiCol_FrameBgActive]          = ImVec4(0.50f, 0.00f, 0.00f, 0.67f);
-style.Colors[ImGuiCol_TitleBg]                = ImVec4(0.30f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_TitleBgActive]          = ImVec4(0.50f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.6f, 0.0f, 0.0f, 0.9f);
-style.Colors[ImGuiCol_MenuBarBg]              = ImVec4(0.6f, 0.0f, 0.0f, 1.0f);
-style.Colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.50f, 0.00f, 0.00f, 0.90f);
-style.Colors[ImGuiCol_ScrollbarGrab]          = ImVec4(1.0f, 0.4f, 0.4f, 0.6f);//
-style.Colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.9f, 0.2f, 0.2f, 0.8f);
-style.Colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // أحمر نيون ساطع وبدون شفافية
-style.Colors[ImGuiCol_CheckMark]              = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);  // أحمر نيون فاتح وقوي
-style.Colors[ImGuiCol_SliderGrab]             = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);  // أحمر مع لمسة نيوني وردي فاتح
-style.Colors[ImGuiCol_SliderGrabActive]       = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);//
-style.Colors[ImGuiCol_Button]                 = ImVec4(0.50f, 0.00f, 0.00f, 0.60f);
-style.Colors[ImGuiCol_ButtonHovered]          = ImVec4(0.70f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_ButtonActive]           = ImVec4(0.80f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_Header]                 = ImVec4(0.50f, 0.00f, 0.00f, 0.31f);
-style.Colors[ImGuiCol_HeaderHovered]          = ImVec4(1.00f, 0.00f, 0.00f, 0.67f); // أحمر غامق
-style.Colors[ImGuiCol_HeaderActive]           = ImVec4(1.00f, 0.00f, 0.00f, 0.95f);
-style.Colors[ImGuiCol_Separator]              = ImVec4(0.6f, 0.1f, 0.1f, 0.5f);
-style.Colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.60f, 0.00f, 0.00f, 0.78f);
-style.Colors[ImGuiCol_SeparatorActive]        = ImVec4(0.70f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_ResizeGrip]             = ImVec4(1.00f, 0.00f, 0.00f, 0.25f);
-style.Colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.60f, 0.00f, 0.00f, 0.80f);
-style.Colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.70f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_Tab]                    = ImVec4(0.50f, 0.00f, 0.00f, 0.86f);
-style.Colors[ImGuiCol_TabHovered]             = ImVec4(0.70f, 0.00f, 0.00f, 0.80f);
-style.Colors[ImGuiCol_TabActive]              = ImVec4(0.80f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_TabUnfocused]           = ImVec4(0.3f, 0.1f, 0.1f, 0.97f);
-style.Colors[ImGuiCol_TabUnfocusedActive]     = ImVec4(0.5f, 0.0f, 0.0f, 1.00f);
-style.Colors[ImGuiCol_PlotLines]              = ImVec4(1.0f, 0.3f, 0.3f, 1.00f);
-style.Colors[ImGuiCol_PlotLinesHovered]       = ImVec4(0.90f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_PlotHistogram]          = ImVec4(0.80f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(0.90f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_TextSelectedBg]         = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
-style.Colors[ImGuiCol_DragDropTarget]         = ImVec4(0.90f, 0.00f, 0.00f, 0.90f);
-style.Colors[ImGuiCol_NavHighlight]           = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
-style.Colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(0.80f, 0.00f, 0.00f, 0.70f);
-style.Colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.50f, 0.00f, 0.00f, 0.20f);
-style.Colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.00f, 0.00f, 0.35f);
+// ── Color scheme: pure black + red accent (iOS-style cheat menu) ──
+style.Colors[ImGuiCol_Text]                  = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
+style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+style.Colors[ImGuiCol_WindowBg]              = ImVec4(0.05f, 0.05f, 0.05f, 0.97f);
+style.Colors[ImGuiCol_ChildBg]               = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+style.Colors[ImGuiCol_PopupBg]               = ImVec4(0.08f, 0.08f, 0.08f, 0.95f);
+style.Colors[ImGuiCol_Border]                = ImVec4(0.28f, 0.28f, 0.28f, 0.60f);
+style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.16f, 0.16f, 0.16f, 0.80f);
+style.Colors[ImGuiCol_FrameBgHovered]        = ImVec4(0.22f, 0.22f, 0.22f, 0.60f);
+style.Colors[ImGuiCol_FrameBgActive]         = ImVec4(0.28f, 0.28f, 0.28f, 0.80f);
+style.Colors[ImGuiCol_TitleBg]               = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+style.Colors[ImGuiCol_TitleBgActive]         = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+style.Colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(0.08f, 0.08f, 0.08f, 0.80f);
+style.Colors[ImGuiCol_MenuBarBg]             = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+style.Colors[ImGuiCol_ScrollbarBg]           = ImVec4(0.06f, 0.06f, 0.06f, 0.90f);
+style.Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.35f, 0.35f, 0.35f, 0.60f);
+style.Colors[ImGuiCol_ScrollbarGrabHovered]  = ImVec4(0.50f, 0.50f, 0.50f, 0.80f);
+style.Colors[ImGuiCol_ScrollbarGrabActive]   = ImVec4(0.70f, 0.70f, 0.70f, 1.00f);
+style.Colors[ImGuiCol_CheckMark]             = ImVec4(0.94f, 0.12f, 0.12f, 1.00f);  // red ✓
+style.Colors[ImGuiCol_SliderGrab]            = ImVec4(0.85f, 0.85f, 0.85f, 1.00f);
+style.Colors[ImGuiCol_SliderGrabActive]      = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+style.Colors[ImGuiCol_Button]                = ImVec4(0.20f, 0.20f, 0.20f, 0.80f);
+style.Colors[ImGuiCol_ButtonHovered]         = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+style.Colors[ImGuiCol_ButtonActive]          = ImVec4(0.42f, 0.42f, 0.42f, 1.00f);
+style.Colors[ImGuiCol_Header]                = ImVec4(0.22f, 0.22f, 0.22f, 0.60f);
+style.Colors[ImGuiCol_HeaderHovered]         = ImVec4(0.30f, 0.30f, 0.30f, 0.80f);
+style.Colors[ImGuiCol_HeaderActive]          = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+style.Colors[ImGuiCol_Separator]             = ImVec4(0.30f, 0.30f, 0.30f, 0.60f);
+style.Colors[ImGuiCol_SeparatorHovered]      = ImVec4(0.50f, 0.50f, 0.50f, 0.78f);
+style.Colors[ImGuiCol_SeparatorActive]       = ImVec4(0.70f, 0.70f, 0.70f, 1.00f);
+style.Colors[ImGuiCol_ResizeGrip]            = ImVec4(0.30f, 0.30f, 0.30f, 0.25f);
+style.Colors[ImGuiCol_ResizeGripHovered]     = ImVec4(0.50f, 0.50f, 0.50f, 0.80f);
+style.Colors[ImGuiCol_ResizeGripActive]      = ImVec4(0.70f, 0.70f, 0.70f, 1.00f);
+style.Colors[ImGuiCol_Tab]                   = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+style.Colors[ImGuiCol_TabHovered]            = ImVec4(0.28f, 0.28f, 0.28f, 0.80f);
+style.Colors[ImGuiCol_TabActive]             = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+style.Colors[ImGuiCol_TabUnfocused]          = ImVec4(0.08f, 0.08f, 0.08f, 0.97f);
+style.Colors[ImGuiCol_TabUnfocusedActive]    = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+style.Colors[ImGuiCol_PlotLines]             = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);
+style.Colors[ImGuiCol_PlotLinesHovered]      = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+style.Colors[ImGuiCol_PlotHistogram]         = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);
+style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.94f, 0.12f, 0.12f, 0.35f);
+style.Colors[ImGuiCol_DragDropTarget]        = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+style.Colors[ImGuiCol_NavHighlight]          = ImVec4(0.94f, 0.12f, 0.12f, 1.00f);
+style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+style.Colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.00f, 0.00f, 0.00f, 0.20f);
+style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.00f, 0.00f, 0.00f, 0.35f);
 
-style.WindowRounding = 10.0f;
-style.ChildRounding = 10.0f;
-style.FrameRounding = 7.0f;
-style.GrabRounding = 12.0f;
-style.PopupRounding = 10.0f;
-style.ScrollbarRounding = 10.0f;
-style.TabRounding = 10.0f;
+style.WindowRounding    = 6.0f;
+style.ChildRounding     = 4.0f;
+style.FrameRounding     = 3.0f;
+style.GrabRounding      = 3.0f;
+style.PopupRounding     = 4.0f;
+style.ScrollbarRounding = 4.0f;
+style.TabRounding       = 4.0f;
 
 // Border sizes
 style.WindowBorderSize = 1.0f;
-style.FrameBorderSize = 1.0f;
-style.PopupBorderSize = 1.0f;
+style.FrameBorderSize  = 0.0f;
+style.PopupBorderSize  = 1.0f;
 
 // Spacing
-style.WindowPadding = ImVec2(10.0f, 8.0f);
-style.FramePadding = ImVec2(12.0f, 4.0f);
-style.ItemSpacing = ImVec2(6.0f, 2.0f);
+style.WindowPadding  = ImVec2(10.0f, 8.0f);
+style.FramePadding   = ImVec2(8.0f, 3.0f);
+style.ItemSpacing    = ImVec2(8.0f, 5.0f);
+style.IndentSpacing  = 14.0f;
 
 
 
@@ -1229,361 +1145,186 @@ void* address[] = {
         font->Scale = 16.f / font->FontSize;
 
         CGFloat x = (([UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.width) - 340) / 2;
-        CGFloat y = (([UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.height) - 250) / 2;
+        CGFloat y = (([UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.height) - 280) / 2;
 
-ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(340, 250), ImGuiCond_FirstUseEver);
-
+        ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(340, 280), ImGuiCond_FirstUseEver);
 
         if (MenDeal == true)
         {
-            ImGui::Begin(ENCRYPT("VIG4R IOS V1"), &MenDeal);
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(9, 4));
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(9, 4));
+            ImGui::Begin(ENCRYPT("VIG4R IOS V1"), &MenDeal,
+                         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 5));
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 3));
 
-            if (ImGui::BeginTabBar("Tab", ImGuiTabBarFlags_FittingPolicyScroll))
+            // Helper lambda — section header with extending line
+            auto SectionHeader = [](const char* txt) {
+                ImVec2 p = ImGui::GetCursorScreenPos();
+                float textW = ImGui::CalcTextSize(txt).x + 8.0f;
+                float lineY = p.y + ImGui::GetTextLineHeight() * 0.55f;
+                float lineX1 = ImGui::GetWindowPos().x + ImGui::GetContentRegionMax().x;
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.72f, 0.72f, 0.72f, 1.0f));
+                ImGui::Text("%s", txt);
+                ImGui::PopStyleColor();
+                ImGui::GetWindowDrawList()->AddLine(
+                    ImVec2(p.x + textW, lineY), ImVec2(lineX1, lineY),
+                    IM_COL32(70, 70, 70, 200), 1.0f);
+                ImGui::Spacing();
+            };
+
+            if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_FittingPolicyScroll))
             {
-                // Tab Visuals
-                if (ImGui::BeginTabItem(ICON_FA_EYE " Esp"))
-{
-
-ImGui::Columns(2, "ESPColumns", false);
-
-    ImGui::Checkbox(ENCRYPT("Enable Esp"), &Vars.Enable);
-
-    ImGui::NextColumn();
-
-
-    ImGui::Checkbox(ENCRYPT("Streaim Mode"), &StreamerMode);
-
-ImGui::Columns(1);
-    ImGui::Separator();
-
-
-    ImGui::Checkbox(ENCRYPT("Esp Line"), &Vars.lines);
-    ImGui::Checkbox(ENCRYPT("Esp Name"), &Vars.Name);
-    ImGui::Checkbox(ENCRYPT("Esp Box"), &Vars.Box);
-    ImGui::Checkbox(ENCRYPT("Esp Skeleton"), &Vars.skeleton);
-
-    ImGui::Checkbox(ENCRYPT("Esp Vida"), &Vars.Health);
-
-
-
-ImGui::Separator();
-
-
-    ImGui::EndTabItem();
-}
-
-
-
-                if (ImGui::BeginTabItem(ICON_FA_CROSSHAIRS " Aimbot"))
-
+                // ══════════════════════════════════════════
+                // TAB 1 — ESP
+                // ══════════════════════════════════════════
+                if (ImGui::BeginTabItem("  ESP  "))
                 {
+                    ImGui::Spacing();
+                    SectionHeader("— VISUAL ESP");
 
-
-
-
-ImGui::Columns(2, "AimBotColumns", false);
-
-                    ImGui::Checkbox(ENCRYPT("Enale Aimbot"), &Vars.Aimbot);
-                  ImGui::Checkbox(ENCRYPT("Ingore Knocked"), &Vars.IgnoreKnocked);
-                  ImGui::Checkbox(ENCRYPT("Aim Wukong"), &Vars.skipwall);
-  ImGui::NextColumn();
-
-
-                    ImGui::Checkbox(ENCRYPT("Ignore Visibility Check"), &Vars.VisibleCheck);
-                    ImGui::Checkbox(ENCRYPT("Show FOV Circle"), &Vars.isAimFov);
-                    ImGui::Checkbox(ENCRYPT("Aim Fov"), &Vars.fovaimglow);
-ImGui::Columns(1);
-
-
+                    ImGui::Checkbox(ENCRYPT("Enable"), &Vars.Enable);
                     ImGui::Separator();
+                    ImGui::Spacing();
 
+                    ImGui::Checkbox(ENCRYPT("Line"), &Vars.lines);
+                    ImGui::SameLine(0, 14); ImGui::Checkbox(ENCRYPT("Box"), &Vars.Box);
+                    ImGui::SameLine(0, 14); ImGui::Checkbox(ENCRYPT("Health"), &Vars.Health);
 
-ImGui::PushItemWidth(190);
-                    ImGui::Combo(ENCRYPT("AimDir"), &Vars.AimWhen, Vars.dir, 4);
-                    ImGui::Combo(ENCRYPT("Target"), &Vars.AimHitbox, Vars.aimHitboxes, 3);
-                    ImGui::Combo(ENCRYPT("Style Aim"), &Vars.aimMode, Vars.aimmode, IM_ARRAYSIZE(Vars.aimmode));
+                    ImGui::Checkbox(ENCRYPT("Name"), &Vars.Name);
+                    ImGui::SameLine(0, 14); ImGui::Checkbox(ENCRYPT("Skeleton"), &Vars.skeleton);
 
-
-ImGui::PopItemWidth();
-
-ImGui::PushItemWidth(210);
-
-
-ImGui::SliderFloat(ENCRYPT("Regular Fov"), &Vars.AimFov, 0.00f, 500.00f, "[ %.1f ]", ImGuiSliderFlags_None);
-
-
-ImGui::PopItemWidth();
-                    // Push/Pop cân bằng
+                    ImGui::Spacing();
                     ImGui::Separator();
+                    ImGui::Checkbox(ENCRYPT("Streamer Mode"), &StreamerMode);
 
                     ImGui::EndTabItem();
                 }
 
-                // Tab Misc
-                if (ImGui::BeginTabItem(ICON_FA_FIRE " Misc"))
+                // ══════════════════════════════════════════
+                // TAB 2 — AIMBOT
+                // ══════════════════════════════════════════
+                if (ImGui::BeginTabItem("  AIMBOT  "))
+                {
+                    ImGui::Spacing();
+                    SectionHeader("— AIMBOT SETTINGS");
 
-{
+                    ImGui::Checkbox(ENCRYPT("Enable Aimbot"), &Vars.Aimbot);
+                    ImGui::SameLine(0, 14);
+                    ImGui::Checkbox(ENCRYPT("Ignore Knocked"), &Vars.IgnoreKnocked);
 
+                    ImGui::Checkbox(ENCRYPT("VIPBypass"), &Vars.skipwall);
+                    ImGui::SameLine(0, 14);
+                    ImGui::Checkbox(ENCRYPT("Visible Check"), &Vars.VisibleCheck);
 
+                    ImGui::Checkbox(ENCRYPT("Show FOV Circle"), &Vars.isAimFov);
+                    ImGui::SameLine(0, 14);
+                    ImGui::Checkbox(ENCRYPT("FOV Glow"), &Vars.fovaimglow);
 
-if (ImGui::Combo("Cor Do Painel", &style_idx, "Roxo\0Azul\0Clássico\0")) {
-    ImGuiStyle& style = ImGui::GetStyle(); // نقل تعريف المتغير خارج الـ switch
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    ImGui::Spacing();
 
-    switch (style_idx) {
-        case 0:
-style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-style.Colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.94f);
-style.Colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-style.Colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-style.Colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-style.Colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.00f, 0.29f, 0.54f);         // بنفسجي غامق
-style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.45f, 0.00f, 0.75f, 0.40f);  // بنفسجي فاتح
-style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.45f, 0.00f, 0.75f, 0.67f);    // بنفسجي ساطع
-style.Colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
-style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.25f, 0.00f, 0.50f, 1.00f);    // بنفسجي داكن
-style.Colors[ImGuiCol_CheckMark] = ImVec4(0.70f, 0.00f, 1.00f, 1.00f);        // بنفسجي نيون
-style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.55f, 0.00f, 0.80f, 1.00f);      // بنفسجي متوسط
-style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.70f, 0.00f, 1.00f, 1.00f); // بنفسجي ساطع
-style.Colors[ImGuiCol_Button] = ImVec4(0.45f, 0.00f, 0.75f, 0.40f);          // بنفسجي شفاف
-style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.70f, 0.00f, 1.00f, 1.00f);   // بنفسجي نيون
-style.Colors[ImGuiCol_Header] = ImVec4(0.45f, 0.00f, 0.75f, 0.31f);          // بنفسجي شفاف
-style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.70f, 0.00f, 1.00f, 0.80f);   // بنفسجي فاتح
-style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.70f, 0.00f, 1.00f, 1.00f);
+                    ImGui::PushItemWidth(150);
+                    ImGui::Combo(ENCRYPT("Aim Dir"),    &Vars.AimWhen,   Vars.dir,         4);
+                    ImGui::Combo(ENCRYPT("Target Bone"),&Vars.AimHitbox, Vars.aimHitboxes, 3);
+                    ImGui::Combo(ENCRYPT("Aim Style"),  &Vars.aimMode,   Vars.aimmode,     IM_ARRAYSIZE(Vars.aimmode));
+                    ImGui::PopItemWidth();
 
-// إكمال إعدادات الألوان لتحقيق التناسق البنفسجي
-style.Colors[ImGuiCol_Tab] = ImVec4(0.20f, 0.00f, 0.35f, 0.86f);            // لون تبويب غير النشط
-style.Colors[ImGuiCol_TabHovered] = ImVec4(0.45f, 0.00f, 0.75f, 0.80f);     // تبويب عند التحويم
-style.Colors[ImGuiCol_TabActive] = ImVec4(0.35f, 0.00f, 0.60f, 1.00f);      // تبويب نشط
-style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.00f, 0.20f, 0.97f);   // تبويب غير مركز
-style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.25f, 0.00f, 0.45f, 1.00f);
-
-// ألوان عناصر التمرير
-style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.08f, 0.00f, 0.15f, 0.90f);    // خلفية شريط التمرير
-style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.45f, 0.00f, 0.75f, 0.60f);  // زر التمرير
-style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.60f, 0.00f, 0.90f, 0.80f);
-style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.70f, 0.00f, 1.00f, 1.00f);
-
-// ألوان العناصر الإضافية
-style.Colors[ImGuiCol_Separator] = ImVec4(0.50f, 0.00f, 0.80f, 0.50f);      // فاصل
-style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.70f, 0.00f, 1.00f, 0.78f);
-style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.80f, 0.00f, 1.00f, 1.00f);
-style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.45f, 0.00f, 0.75f, 0.60f);     // مقبض التغيير
-style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.60f, 0.00f, 0.90f, 0.80f);
-style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.70f, 0.00f, 1.00f, 1.00f);
-style.Colors[ImGuiCol_PlotLines] = ImVec4(0.80f, 0.00f, 1.00f, 1.00f);      // خطوط الرسوم
-style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.80f, 0.00f, 1.00f, 1.00f);  // أشرطة الرسوم
-  // بنفسجي ساطع
-            break;
-        case 1:
-            ImGui::StyleColorsDark();
-            break;
-        case 2:
-            ImGui::StyleColorsClassic();
-            break;
-
-            case 3:
-            // 🎨 ثيم أبيض
-            ImGui::StyleColorsLight();
-            style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f); // نص أسود
-            style.Colors[ImGuiCol_Button] = ImVec4(1.00f, 1.00f, 1.00f, 0.80f); // زر أبيض
-            style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
-            style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);
-            break;
-    }
-}
-
-
-
- ImGui::Separator();
-
-
-                 //   ImGui::Columns(2, "MiscColumns", false);
-                    if (ImGui::Checkbox(ENCRYPT("Speed "), &SpeeeX2Enabled)) {
-    [self toggleSpeedX2:SpeeeX2Enabled];
-}
-ImGui::SameLine();
-ImGui::TextDisabled("");
-if (ImGui::IsItemHovered())
-    ImGui::SetTooltip("");
-
-
-
-
-
-if (ImGui::Checkbox(ENCRYPT("No Recoil"), &NoRecoilEnabled)) {
-    [self toggleNoRecoil:NoRecoilEnabled];
-}
-ImGui::SameLine();
-ImGui::TextDisabled("");
-if (ImGui::IsItemHovered())
-    ImGui::SetTooltip("");
-
-
- ImGui::Checkbox(ENCRYPT("Bypass"), &BypassEnabled);
-ImGui::Checkbox(ENCRYPT("Up Player "), &Vars.isfly);
- ImGui::Checkbox(ENCRYPT("Teleport Player"), &Vars.Telekill1);  // boutton activity aw9
- ImGui::Checkbox(ENCRYPT("fake tele"), &Vars.fakeTelekill1);  // boutton activity aw9
-ImGui::Checkbox(ENCRYPT("Fast Reload"), &Fastzbb);
-
-
-
-
-
-
- if (ImGui::Checkbox(oxorany("Under KIll"), &Vars.ShowUndergroundButton)) {
-                        if (Vars.ShowUndergroundButton) {
-                            if (!self.undergroundButtonView) {
-                                [self undergroundModeUI];
-                            }
-                        } else {
-                            if (self.undergroundButtonView) {
-                                [self.undergroundButtonView removeFromSuperview];
-                                self.undergroundButtonView = nil;
-                            }
-                            Vars.Underground = false;
-                        }
-                    }
-
-
-if (ImGui::Checkbox(oxorany("Blamyban"), &Vars.ShowBlamybanButton)) {
-    if (Vars.ShowBlamybanButton) {
-        if (!self.blamybanButtonView) {
-            [self blamybanModeUI];
-        }
-    } else {
-        if (self.blamybanButtonView) {
-            [self.blamybanButtonView removeFromSuperview];
-            self.blamybanButtonView = nil;
-        }
-        Vars.Blamyban = false; // ensure OFF when hidden
-    }
-}
-
-
-
-
-if (Vars.Telekill1) {
-    if (!self.telekillButtonView) {
-        [self telekillModeUI];
-    }
-} else {
-    if (self.telekillButtonView) {
-        [self.telekillButtonView removeFromSuperview];
-        self.telekillButtonView = nil;
-    }
-}
-
-if (Vars.fakeTelekill1) {
-    if (!self.faketelekillButtonView) {
-        [self faketelekillModeUI];
-    }
-} else {
-    if (self.faketelekillButtonView) {
-        [self.faketelekillButtonView removeFromSuperview];
-        self.faketelekillButtonView = nil;
-    }
-}
-
-
-
-
-if (ImGui::Checkbox(oxorany("Ninja Run"), &Vars.ShowNinjaButton)) {
-                        if (Vars.ShowNinjaButton) {
-                            if (!self.ninjarunButtonView) {
-                                [self ninjaRunModeUI];
-                            }
-                        } else {
-                            if (self.ninjarunButtonView) {
-                                [self.ninjarunButtonView removeFromSuperview];
-                                self.ninjarunButtonView = nil;
-                            }
-                            Vars.Ninjarun = false;
-                        }
-                    }
-
-
-
-
-
-
-
- ImGui::Checkbox(ENCRYPT("Ghost"), &Vars.ShowGhostButton);
-if (Vars.ShowGhostButton) {
-    if (!self.ghostButtonView) {
-        [self ghostModeUI];
-    }
-} else {
-    if (self.ghostButtonView) {
-        [self.ghostButtonView removeFromSuperview];
-        self.ghostButtonView = nil;
-    }
-}
-
-
-
-
-
-
-
+                    ImGui::PushItemWidth(200);
+                    ImGui::SliderFloat(ENCRYPT("FOV Radius"), &Vars.AimFov, 0.00f, 500.00f, "%.0f");
+                    ImGui::PopItemWidth();
 
                     ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
 
+                // ══════════════════════════════════════════
+                // TAB 3 — MSL
+                // ══════════════════════════════════════════
+                if (ImGui::BeginTabItem("  MSL  "))
+                {
+                    ImGui::Spacing();
+                    SectionHeader("— MOVEMENT SPEED");
 
+                    if (ImGui::Checkbox(ENCRYPT("Speed Hack"), &SpeeeX2Enabled))
+                        [self toggleSpeedX2:SpeeeX2Enabled];
+                    if (ImGui::Checkbox(ENCRYPT("No Recoil"), &NoRecoilEnabled))
+                        [self toggleNoRecoil:NoRecoilEnabled];
+                    ImGui::Checkbox(ENCRYPT("Fast Reload"), &Fastzbb);
+                    ImGui::Checkbox(ENCRYPT("Up Player"),   &Vars.isfly);
 
+                    ImGui::Spacing();
+                    SectionHeader("— EXTRA FEATURES");
 
-    ImGui::EndTabItem();
-}
+                    ImGui::Checkbox(ENCRYPT("Bypass"), &BypassEnabled);
 
-                if (ImGui::BeginTabItem(ICON_FA_COG " Setting"))
-{
-    // هنا يمكنك إضافة عناصر واجهة المستخدم الخاصة بـ Settings
-    ImGui::Checkbox(ENCRYPT("Reset Guest"), &rsttk);
-    ImGui::Text("VIGAR KING");
+                    if (ImGui::Checkbox(ENCRYPT("Under Kill"), &Vars.ShowUndergroundButton)) {
+                        if (Vars.ShowUndergroundButton) { if (!self.undergroundButtonView) [self undergroundModeUI]; }
+                        else { [self.undergroundButtonView removeFromSuperview]; self.undergroundButtonView = nil; Vars.Underground = false; }
+                    }
+                    if (ImGui::Checkbox(ENCRYPT("Blamyban"), &Vars.ShowBlamybanButton)) {
+                        if (Vars.ShowBlamybanButton) { if (!self.blamybanButtonView) [self blamybanModeUI]; }
+                        else { [self.blamybanButtonView removeFromSuperview]; self.blamybanButtonView = nil; Vars.Blamyban = false; }
+                    }
+                    if (ImGui::Checkbox(ENCRYPT("Ninja Run"), &Vars.ShowNinjaButton)) {
+                        if (Vars.ShowNinjaButton) { if (!self.ninjarunButtonView) [self ninjaRunModeUI]; }
+                        else { [self.ninjarunButtonView removeFromSuperview]; self.ninjarunButtonView = nil; Vars.Ninjarun = false; }
+                    }
+                    ImGui::Checkbox(ENCRYPT("Ghost"), &Vars.ShowGhostButton);
+                    if (Vars.ShowGhostButton) { if (!self.ghostButtonView) [self ghostModeUI]; }
+                    else if (self.ghostButtonView) { [self.ghostButtonView removeFromSuperview]; self.ghostButtonView = nil; }
 
-    if (ImGui::Button(ENCRYPT("Telegram"), ImVec2(120, 30)))
+                    ImGui::Checkbox(ENCRYPT("Teleport Player"), &Vars.Telekill1);
+                    if (Vars.Telekill1) { if (!self.telekillButtonView) [self telekillModeUI]; }
+                    else if (self.telekillButtonView) { [self.telekillButtonView removeFromSuperview]; self.telekillButtonView = nil; }
 
-            {
-                NSString *urlStr = @(ENCRYPT("https://t.me/Vig4r"));
+                    ImGui::Checkbox(ENCRYPT("Fake Tele"), &Vars.fakeTelekill1);
+                    if (Vars.fakeTelekill1) { if (!self.faketelekillButtonView) [self faketelekillModeUI]; }
+                    else if (self.faketelekillButtonView) { [self.faketelekillButtonView removeFromSuperview]; self.faketelekillButtonView = nil; }
 
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
-            }
+                    ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
 
-            ImGui::SameLine();
+                // ══════════════════════════════════════════
+                // TAB 4 — EXTRA (Settings)
+                // ══════════════════════════════════════════
+                if (ImGui::BeginTabItem("  EXTRA  "))
+                {
+                    ImGui::Spacing();
+                    SectionHeader("— SETTINGS");
 
-            if (ImGui::Button("Group", ImVec2(120, 30)))
-            {
-                NSString *urlStr = @(ENCRYPT("https://t.me/+EaVfFi4BqFgyMGU0"));
+                    ImGui::Checkbox(ENCRYPT("Reset Guest"), &rsttk);
+                    ImGui::Spacing();
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.55f, 0.55f, 0.55f, 1.0f));
+                    ImGui::Text("VIGAR KING");
+                    ImGui::PopStyleColor();
+                    ImGui::Spacing();
 
+                    if (ImGui::Button(ENCRYPT("Telegram"), ImVec2(110, 26))) {
+                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@(ENCRYPT("https://t.me/Vig4r"))]];
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(ENCRYPT("Group"), ImVec2(110, 26))) {
+                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@(ENCRYPT("https://t.me/+EaVfFi4BqFgyMGU0"))]];
+                    }
+                    ImGui::Spacing();
+                    if (ImGui::Button(ENCRYPT("Fix Login"), ImVec2(110, 26))) {
+                        self.mtkView.hidden = YES;
+                        MenDeal = NO;
+                        timer(40) {
+                            self.mtkView.hidden = NO;
+                            MenDeal = YES;
+                        });
+                    }
 
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
-            }
-if (ImGui::Button(ENCRYPT("Fix Login"), ImVec2(120, 30)))
-    {
-        self.mtkView.hidden = YES;
-        MenDeal = NO;
-        timer(40) {
-            self.mtkView.hidden = NO;
-            MenDeal = YES;
-        });
-    }
+                    ImGui::Separator();
+                    ImGui::EndTabItem();
+                }
 
-
-
-
-    //if (ImGui::Button("Save Settings")){
-        //[self saveSettings];
-    //}
-
-    ImGui::EndTabItem();
-}
                 ImGui::EndTabBar();
             }
 
-            // Khôi phục style vars
             ImGui::PopStyleVar(2);
             ImGui::End();
         }
