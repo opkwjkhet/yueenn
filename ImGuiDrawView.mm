@@ -1152,7 +1152,7 @@ void* address[] = {
 
         if (MenDeal == true)
         {
-            ImGui::Begin(ENCRYPT("VIG4R IOS V1"), &MenDeal,
+            ImGui::Begin(ENCRYPT("MOD V3 LATEST"), &MenDeal,
                          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 5));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 3));
@@ -1297,16 +1297,16 @@ void* address[] = {
                     ImGui::Checkbox(ENCRYPT("Reset Guest"), &rsttk);
                     ImGui::Spacing();
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.55f, 0.55f, 0.55f, 1.0f));
-                    ImGui::Text("VIGAR KING");
+                    ImGui::Text("MONALISA");
                     ImGui::PopStyleColor();
                     ImGui::Spacing();
 
                     if (ImGui::Button(ENCRYPT("Telegram"), ImVec2(110, 26))) {
-                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@(ENCRYPT("https://t.me/Vig4r"))]];
+                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@(ENCRYPT("https://t.me/redyuiopk"))]];
                     }
                     ImGui::SameLine();
                     if (ImGui::Button(ENCRYPT("Group"), ImVec2(110, 26))) {
-                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@(ENCRYPT("https://t.me/+EaVfFi4BqFgyMGU0"))]];
+                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@(ENCRYPT("https://t.me/monstercheatez"))]];
                     }
                     ImGui::Spacing();
                     if (ImGui::Button(ENCRYPT("Fix Login"), ImVec2(110, 26))) {
