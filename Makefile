@@ -63,7 +63,5 @@ GameController \
 Metal \
 MetalKit
 
-# ✅ LDFLAGS — แก้ให้ถูกต้อง (ใช้ -F และ -framework)
-VIGAR_LDFLAGS += -F$(PWD)/JRMemory.framework -framework JRMemory
-
+VIGAR_LDFLAGS += JRMemory.framework/JRMemory
 include $(THEOS)/makefiles/tweak.mk
