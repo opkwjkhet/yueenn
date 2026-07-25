@@ -344,7 +344,7 @@ bool antiban(void* instance) {
     label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
     label.font = [UIFont boldSystemFontOfSize:9];
     label.textAlignment = NSTextAlignmentCenter;
-    label.text = @"F-UNDER";
+    label.text = @"JetUNDER";
     label.backgroundColor = [UIColor clearColor];
     [self.blamybanButtonView addSubview:label];
 
@@ -449,7 +449,7 @@ bool antiban(void* instance) {
     label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
     label.font = [UIFont boldSystemFontOfSize:9];
     label.textAlignment = NSTextAlignmentCenter;
-    label.text = @"TELE";
+    label.text = @"Telekill";
     label.backgroundColor = [UIColor clearColor];
     [self.telekillButtonView addSubview:label];
 
@@ -509,7 +509,7 @@ bool antiban(void* instance) {
     label.textColor = [UIColor colorWithWhite:0.80f alpha:1.0f];
     label.font = [UIFont boldSystemFontOfSize:9];
     label.textAlignment = NSTextAlignmentCenter;
-    label.text = @"F-TELE";
+    label.text = @"KillTELE";
     label.backgroundColor = [UIColor clearColor];
     [self.faketelekillButtonView addSubview:label];
 
@@ -1152,7 +1152,7 @@ void* address[] = {
 
         if (MenDeal == true)
         {
-            ImGui::Begin(ENCRYPT("MOD V3 LATEST"), &MenDeal,
+            ImGui::Begin(ENCRYPT("Monster v3"), &MenDeal,
                          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 5));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 3));
@@ -1278,7 +1278,7 @@ void* address[] = {
                     if (Vars.Telekill1) { if (!self.telekillButtonView) [self telekillModeUI]; }
                     else if (self.telekillButtonView) { [self.telekillButtonView removeFromSuperview]; self.telekillButtonView = nil; }
 
-                    ImGui::Checkbox(ENCRYPT("Fake Tele"), &Vars.fakeTelekill1);
+                    ImGui::Checkbox(ENCRYPT("KillTele"), &Vars.fakeTelekill1);
                     if (Vars.fakeTelekill1) { if (!self.faketelekillButtonView) [self faketelekillModeUI]; }
                     else if (self.faketelekillButtonView) { [self.faketelekillButtonView removeFromSuperview]; self.faketelekillButtonView = nil; }
 
