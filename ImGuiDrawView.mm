@@ -97,7 +97,6 @@ UIButton *menuView;
 
 
 
-
 @implementation ImGuiDrawView
 ImFont *_espFont;
 ImFont* verdanab;
@@ -128,13 +127,13 @@ bool WallFlyEnabled = false;
 bool WallHackEnabled = false;
 bool ScopeEnabled = false;
 bool BypassEnabled = true;
-bool Underground = false; // Underground
-bool ShowUndergroundButton = false; // Nút Underground
-bool Ninjarun = false; // Underground
-bool ShowNinjarunButton = false; // Nút Underground
+bool Underground = false;
+bool ShowUndergroundButton = false;
+bool Ninjarun = false;
+bool ShowNinjarunButton = false;
 
-bool Blamyban = false;             // UI-only toggle state
-bool ShowBlamybanButton = false;   // show/hide the floating button
+bool Blamyban = false;
+bool ShowBlamybanButton = false;
 
 bool Fastzbb = false;
 bool FlyHack = false;
@@ -156,6 +155,12 @@ bool Guest(void* _this){
      return true;
     } else { return true;
 }
+}
+
+// ── Reset Guest hook ── offset 0x4DE1380 (get_ResetGuest)
+// return true = game treats account as "reset guest" state
+bool HOOK_ResetGuest(void* _this) {
+    return true;
 }
 
 
@@ -191,7 +196,6 @@ bool antiban(void* instance) {
 
 
 
-
 - (void)applicationWillTerminate:(UIApplication *)application {
     [self saveSettings];
 }
@@ -223,16 +227,6 @@ bool antiban(void* instance) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 - (void)toggleSpeedX2:(BOOL)enable {
     static dispatch_once_t onceToken;
     static vector<void*> results;
@@ -252,7 +246,7 @@ bool antiban(void* instance) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_ULong);
         }
     } else {
-        uint64_t modify = 4397530849764387586; // Original value
+        uint64_t modify = 4397530849764387586;
         for(int i = 0; i < results.size(); i++) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_ULong);
         }
@@ -263,21 +257,10 @@ bool antiban(void* instance) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 - (void)undergroundModeUI {
     if (self.undergroundButtonView) return;
     UIWindow *win = [UIApplication sharedApplication].keyWindow;
 
-    // iOS 15-style: UIButtonTypeCustom, solid dark background, no glass
     self.undergroundButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
     self.undergroundButtonView.frame = CGRectMake(305, 300, 64, 54);
     self.undergroundButtonView.backgroundColor = [[UIColor colorWithRed:0.10f green:0.10f blue:0.10f alpha:0.88f] colorWithAlphaComponent:0.88f];
@@ -313,9 +296,6 @@ bool antiban(void* instance) {
     CGPoint location = [touch locationInView:self.view];
     c.center = location;
 }
-
-
-
 
 
 - (void)undergroundSwitchChanged:(UISwitch *)sender {
@@ -359,12 +339,8 @@ bool antiban(void* instance) {
 }
 
 - (void)blamybanSwitchChanged:(UISwitch *)sender {
-    Vars.Blamyban = sender.on; // UI-only flag
+    Vars.Blamyban = sender.on;
 }
-
-
-
-
 
 
 - (void)toggleNoRecoil:(BOOL)enable {
@@ -376,17 +352,17 @@ bool antiban(void* instance) {
 
     if (enable) {
         dispatch_once(&onceToken, ^{
-            uint32_t search = 1016018816; // Original value to search for
+            uint32_t search = 1016018816;
             engine->JRScanMemory(range, &search, JR_Search_Type_UInt);
             results = engine->getAllResults();
         });
 
-        uint32_t modify = 180; // New value to write
+        uint32_t modify = 180;
         for(int i = 0; i < results.size(); i++) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_UInt);
         }
     } else {
-        uint32_t modify = 1016018816; // Original value to restore
+        uint32_t modify = 1016018816;
         for(int i = 0; i < results.size(); i++) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_UInt);
         }
@@ -410,7 +386,6 @@ bool antiban(void* instance) {
             results = engine->getAllResults();
         });
 
-
         float modify = 965.0f;
         for(int i = 0; i < results.size(); i++) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_Float);
@@ -425,7 +400,6 @@ bool antiban(void* instance) {
     }
     delete engine;
 }
-
 
 
 
@@ -484,7 +458,7 @@ bool antiban(void* instance) {
 
 
 - (void)telekillSwitchChanged:(UISwitch *)sender {
-    Vars.Telekill = sender.on; // Amr
+    Vars.Telekill = sender.on;
 }
 
 
@@ -544,11 +518,8 @@ bool antiban(void* instance) {
 
 
 - (void)faketelekillSwitchChanged:(UISwitch *)sender {
-    Vars.fakeTelekill = sender.on; // Amr
+    Vars.fakeTelekill = sender.on;
 }
-
-
-
 
 
 
@@ -588,8 +559,6 @@ bool antiban(void* instance) {
 
 
 
-
-
 - (void)handleninjaDrag:(UIPanGestureRecognizer *)gesture {
     if (!gesture || !gesture.view) return;
 
@@ -609,13 +578,8 @@ bool antiban(void* instance) {
 
 
 - (void)ninjaSwitchChanged:(UISwitch *)sender {
-    Vars.Ninjarun = sender.on; // Amr
+    Vars.Ninjarun = sender.on;
 }
-
-
-
-
-
 
 
 
@@ -651,7 +615,6 @@ bool antiban(void* instance) {
               forControlEvents:UIControlEventValueChanged];
     [self.ghostButtonView addSubview:self.ghostSwitch];
 
-    // Timer label above button
     self.ghostTimerLabel = [[UILabel alloc] initWithFrame:CGRectMake(
         self.ghostButtonView.frame.origin.x,
         self.ghostButtonView.frame.origin.y - 24, 64, 20)];
@@ -673,10 +636,8 @@ bool antiban(void* instance) {
     CGFloat deltaX = location.x - previousLocation.x;
     CGFloat deltaY = location.y - previousLocation.y;
 
-    // تحريك الزر
     button.center = CGPointMake(button.center.x + deltaX, button.center.y + deltaY);
 
-    // تحريك العداد ليبقى فوق الزر
     if (self.ghostTimerLabel) {
         CGRect frame = self.ghostTimerLabel.frame;
         frame.origin.x = button.frame.origin.x;
@@ -692,13 +653,11 @@ bool antiban(void* instance) {
     self.ghostTimerLabel.text = [NSString stringWithFormat:@"%ds", self.ghostSeconds];
 
     if (self.ghostSeconds >= 5) {
-        self.ghostTimerLabel.textColor = [UIColor redColor];  // بعد 5 ثواني يصبح أحمر
+        self.ghostTimerLabel.textColor = [UIColor redColor];
     } else {
-        self.ghostTimerLabel.textColor = [UIColor greenColor]; // قبل 5 ثواني باللون الأسود
+        self.ghostTimerLabel.textColor = [UIColor greenColor];
     }
 }
-
-
 
 
 
@@ -706,17 +665,15 @@ bool antiban(void* instance) {
     Vars.EnableGhost = sender.on;
 
     static bool ghostState = false;
-    void* ghostMain = (void*)getRealOffset(ENCRYPTOFFSET("0x105C0DC8C")); // main ghost effect
+    void* ghostMain = (void*)getRealOffset(ENCRYPTOFFSET("0x105C0DC8C"));
 
     if (sender.on && !ghostState) {
-        // فعل الـ Ghost
         hook((void*[]){ ghostMain },
              (void*[]){ (void*)FUNC_GHOST },
              1);
         func_ghost = true;
         ghostState = true;
 
-        // إعداد وإظهار العداد
         self.ghostSeconds = 1;
         self.ghostTimerLabel.hidden = NO;
         self.ghostTimerLabel.textColor = [UIColor greenColor];
@@ -729,12 +686,10 @@ bool antiban(void* instance) {
                                                           repeats:YES];
 
     } else if (!sender.on && ghostState) {
-        // إيقاف الـ Ghost
         unhook(ghostMain);
         func_ghost = false;
         ghostState = false;
 
-        // إخفاء العداد وإيقاف التايمر
         [self.ghostTimer invalidate];
         self.ghostTimer = nil;
         self.ghostTimerLabel.hidden = YES;
@@ -814,8 +769,6 @@ bool antiban(void* instance) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_Float);
         }
     } else {
-        // Note: Original values not provided in the original code
-        // You would need to restore the original values here
         onceToken = 0;
         results.clear();
     }
@@ -887,7 +840,7 @@ bool antiban(void* instance) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_Float);
         }
     } else {
-        float modify = 0.03f; // Original value
+        float modify = 0.03f;
         for(int i = 0; i < results.size(); i++) {
             engine->JRWriteMemory((unsigned long long)(results[i]), &modify, JR_Search_Type_Float);
         }
@@ -911,7 +864,7 @@ bool antiban(void* instance) {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGuiStyle& style = ImGui::GetStyle();
 
-// ── Color scheme: pure black + red accent (iOS-style cheat menu) ──
+// ── Color scheme: pure black + red accent ──
 style.Colors[ImGuiCol_Text]                  = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
 style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 style.Colors[ImGuiCol_WindowBg]              = ImVec4(0.05f, 0.05f, 0.05f, 0.97f);
@@ -930,7 +883,7 @@ style.Colors[ImGuiCol_ScrollbarBg]           = ImVec4(0.06f, 0.06f, 0.06f, 0.90f
 style.Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.35f, 0.35f, 0.35f, 0.60f);
 style.Colors[ImGuiCol_ScrollbarGrabHovered]  = ImVec4(0.50f, 0.50f, 0.50f, 0.80f);
 style.Colors[ImGuiCol_ScrollbarGrabActive]   = ImVec4(0.70f, 0.70f, 0.70f, 1.00f);
-style.Colors[ImGuiCol_CheckMark]             = ImVec4(0.94f, 0.12f, 0.12f, 1.00f);  // red ✓
+style.Colors[ImGuiCol_CheckMark]             = ImVec4(0.94f, 0.12f, 0.12f, 1.00f);
 style.Colors[ImGuiCol_SliderGrab]            = ImVec4(0.85f, 0.85f, 0.85f, 1.00f);
 style.Colors[ImGuiCol_SliderGrabActive]      = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 style.Colors[ImGuiCol_Button]                = ImVec4(0.20f, 0.20f, 0.20f, 0.80f);
@@ -969,26 +922,14 @@ style.PopupRounding     = 4.0f;
 style.ScrollbarRounding = 4.0f;
 style.TabRounding       = 4.0f;
 
-// Border sizes
 style.WindowBorderSize = 1.0f;
 style.FrameBorderSize  = 0.0f;
 style.PopupBorderSize  = 1.0f;
 
-// Spacing
 style.WindowPadding  = ImVec2(10.0f, 8.0f);
 style.FramePadding   = ImVec2(8.0f, 3.0f);
 style.ItemSpacing    = ImVec2(8.0f, 5.0f);
 style.IndentSpacing  = 14.0f;
-
-
-
-
-
-
-
-
-
-
 
     static const ImWchar icons_ranges[] = { 0xf000, 0xf3ff, 0 };
     ImFontConfig icons_config;
@@ -1026,9 +967,7 @@ style.IndentSpacing  = 14.0f;
     CGFloat h = [UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.height;
     self.view = [[MTKView alloc] initWithFrame:CGRectMake(0, 0, w, h)];
 void* address[] = {
-(void*)getRealOffset(ENCRYPTOFFSET("0x44C752C")),
-
-
+    (void*)getRealOffset(ENCRYPTOFFSET("0x44C752C")),
     };
     void* function[] = {
         (void*)Guest,
@@ -1041,7 +980,6 @@ void* address[] = {
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         mainWindow = [UIApplication sharedApplication].keyWindow;
-        // [self text]; ← تم حذفه
     });
 
     self.mtkView.device = self.device;
@@ -1099,9 +1037,6 @@ void* address[] = {
 
 
 
-
-// أضف قبل drawInMTKView
-
 #pragma mark - MTKViewDelegate
 - (void)drawInMTKView:(MTKView *)view {
     ImGuiIO& io = ImGui::GetIO();
@@ -1111,9 +1046,6 @@ void* address[] = {
     CGFloat framebufferScale = view.window.screen.nativeScale ?: UIScreen.mainScreen.nativeScale;
     io.DisplayFramebufferScale = ImVec2(framebufferScale, framebufferScale);
     io.DeltaTime = 1 / float(view.preferredFramesPerSecond ?: 60);
-
-
-
 
     id<MTLCommandBuffer> commandBuffer = [self.commandQueue commandBuffer];
 
@@ -1254,6 +1186,41 @@ void* address[] = {
                     ImGui::Checkbox(ENCRYPT("Up Player"),   &Vars.isfly);
 
                     ImGui::Spacing();
+                    SectionHeader("— FLY");
+
+                    // ── FLY ALT ──────────────────────────────────
+                    // บินขึ้นสูงๆทะลุทุกอย่าง ไม่กดปิดไม่หยุด
+                    ImGui::Checkbox(ENCRYPT("FLY ALT"), &Vars.flyaltura);
+                    if (Vars.flyaltura) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.94f, 0.12f, 0.12f, 1.0f));
+                        ImGui::Text("[ON]");
+                        ImGui::PopStyleColor();
+                    }
+
+                    // ── FLY V2 ───────────────────────────────────
+                    // พุ่งขึ้นด้วยความเร็ว 0.001s
+                    ImGui::Checkbox(ENCRYPT("FLY V2"), &Vars.FlyV2);
+                    if (Vars.FlyV2) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.94f, 0.12f, 0.12f, 1.0f));
+                        ImGui::Text("[ON]");
+                        ImGui::PopStyleColor();
+                    }
+
+                    // ── FLY GLIDER ───────────────────────────────
+                    // กดเปิด = ร่มโพล่มาทันที (StartParachute)
+                    if (ImGui::Checkbox(ENCRYPT("FLY GLIDER"), &Vars.FlyGlider)) {
+                        // toggle resets the one-shot flag automatically in get_players()
+                    }
+                    if (Vars.FlyGlider) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.20f, 0.80f, 0.20f, 1.0f));
+                        ImGui::Text("[GLIDING]");
+                        ImGui::PopStyleColor();
+                    }
+
+                    ImGui::Spacing();
                     SectionHeader("— EXTRA FEATURES");
 
                     ImGui::Checkbox(ENCRYPT("Bypass"), &BypassEnabled);
@@ -1294,7 +1261,22 @@ void* address[] = {
                     ImGui::Spacing();
                     SectionHeader("— SETTINGS");
 
-                    ImGui::Checkbox(ENCRYPT("Reset Guest"), &rsttk);
+                    ImGui::Checkbox(ENCRYPT("Reset Guest (old)"), &rsttk);
+
+                    // ── Reset Guest ใหม่ — hook get_ResetGuest @ 0x4DE1380 ──
+                    if (ImGui::Checkbox(ENCRYPT("Reset Guest"), &Vars.ResetGuest)) {
+                        static bool _rgHooked = false;
+                        void* rgAddr = (void*)getRealOffset(ENCRYPTOFFSET("0x4DE1380"));
+                        if (Vars.ResetGuest && !_rgHooked) {
+                            void* addr[] = { rgAddr };
+                            void* fn[]   = { (void*)HOOK_ResetGuest };
+                            hook(addr, fn, 1);
+                            _rgHooked = true;
+                        } else if (!Vars.ResetGuest && _rgHooked) {
+                            unhook(rgAddr);
+                            _rgHooked = false;
+                        }
+                    }
                     ImGui::Spacing();
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.55f, 0.55f, 0.55f, 1.0f));
                     ImGui::Text("MONALISA");
@@ -1328,7 +1310,7 @@ void* address[] = {
             ImGui::PopStyleVar(2);
             ImGui::End();
         }
-        if (cc && !hasGhostBeenDrawn) { // Kiểm tra cc và biến cờ
+        if (cc && !hasGhostBeenDrawn) {
             [self ghost];
         } else if (!cc) {
             [self removeGhost];
