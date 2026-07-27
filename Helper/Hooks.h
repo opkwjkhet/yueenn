@@ -13,7 +13,6 @@
 
 
 
-
     #include <map>
     #define nullptr NULL
     #define stone 0x1 
@@ -71,7 +70,6 @@ enum EFireType {
     bool UpPlayer = false;
     bool cameraAdjusted = false;
     bool SpeedFire = false;
-    
     
 
     bool Noreload = false;
@@ -153,8 +151,9 @@ enum EFireType {
         float timer = 0.0f;
         bool fly = false;
         float flySpeed = 0.0f;
-        bool FlyV2 = false; 
-        bool flyaltura = false;
+        bool FlyV2 = false;     // FlyV2: พุ่งขึ้นด้วยความเร็ว 0.001s
+        bool flyaltura = false; // FLY ALT: บินขึ้นสูงๆทะลุทุกอย่าง ไม่หยุด
+        bool FlyGlider = false; // FLY GLIDER: เรียก StartParachute ทันที
         bool ShowAimKillButton = false; 
         bool FlyV3 = false;  
         bool telehack = false; 
@@ -171,19 +170,18 @@ enum EFireType {
 
         float FlySpeeed = 0.0f;
          float FlyHeigght = 0.0f;
-        bool InfiniteJump = false; // إضافة هذا المتغي
+        bool InfiniteJump = false;
          bool TelekillSliderEnabled = false; 
-    float TeleX = 0.0f; // تأكد أن المدى في الـ UI هو 0-70
-    float TeleY = 0.0f; // تأكد أن المدى في الـ UI هو 0-70
+    float TeleX = 0.0f;
+    float TeleY = 0.0f;
 
-
-        bool Auto_Teleport = false; // تفعيل أو تعطيل التيلبورت التلقائي
-        int NewRound_CallCount = 0; // عداد الجولات
+        bool Auto_Teleport = false;
+        int NewRound_CallCount = 0;
 
         float MaxDistance = 100.0f;
             Vector3 LockedPos = Vector3::zero(); 
 
-
+        bool ResetGuest = false;  // hook get_ResetGuest @ 0x4DE1380
         bool b_SuperFly = false;
             bool ShowZBBButton = false;
             bool ShowZBBBBBBBBBBBBButton = false;
@@ -191,7 +189,7 @@ enum EFireType {
             bool ShowddButton = false;
             int CurrentRoundCount = 0;
              bool AutoTelekillRound = false;
-             bool ShowMapLine = true; // لتفعيل/تعطيل الخط من القائمة
+             bool ShowMapLine = true;
              float flyHeighteezz = 0.0f;
              bool flyV39 = false; 
              bool fly3838 = false; 
@@ -199,12 +197,10 @@ enum EFireType {
              float ForwardFly = 0.0f;
              float JumpUp = 0.0f;
 
-
-
         float FlyHeight = 18.5f;
         bool SmoothFly = false;
-        float flyHeightLimit = 15.0f; // الارتفاع المطلوب
-        float descentSpeed = 0.05f;   // سرعة الهبوط (كلما قل الرقم كان أبطأ)
+        float flyHeightLimit = 15.0f;
+        float descentSpeed = 0.05f;
           bool SpeedHack = false;
           bool MagnetEnemy = false;
              float FlyHeighte = 5.0f; 
@@ -218,29 +214,16 @@ enum EFireType {
           Vector3 SavedMarkPos = {0,0,0};  
             bool ShowKillFeed = true;
                 ImVec4 MyNameColor = ImVec4(0.0f, 0.5f, 1.0f, 1.0f);
-            const char* CurrentWeaponName = "Desert Eagle"; // يمكن جلب هذا برمجياً لاحقاً
+            const char* CurrentWeaponName = "Desert Eagle";
                 bool AirWalkVisible = false;
                      float AirHeightVisible = 180.0f;
                      float AirHeightVisibleauto = 180.0f;
                     float AirHeight = 0.0f;
 
-
-
-
-
-
-
-
-        
-        
-
         Vector3 originalPos; 
 
 
-
-
     } Vars;
-
 
 
 } // namespace Save
@@ -346,6 +329,25 @@ static void SwapWeapon(void *player, int POFFNNMOOBM, bool GDKLMFLNNGM) {
         void (*_Transform_INTERNAL_SetPosition)(void *transform, Vvector3 in) = (void (*)(void *, Vvector3))getRealOffset(ENCRYPTOFFSET("0x91CA6A8"));
         _Transform_INTERNAL_SetPosition(player, inn);
     }
+
+// ─────────────────────────────────────────────────────────────
+// FLY GLIDER  — offset 0x6427B40 (StartParachute override)
+// Calling this on the local player's flight-state object forces
+// the parachute to open wherever the player is standing.
+// ─────────────────────────────────────────────────────────────
+static void ForceStartParachute(void* player) {
+    void (*_StartParachute)(void* player) = (void (*)(void*))getRealOffset(ENCRYPTOFFSET("0x6427B40"));
+    if (_StartParachute) _StartParachute(player);
+}
+
+// ─────────────────────────────────────────────────────────────
+// GameFacade_Send  — user-supplied offset 0x055CE9F8
+// Call with the local GameFacade instance to flush pending packets.
+// ─────────────────────────────────────────────────────────────
+static void GameFacade_Send(void* facade) {
+    void (*_Send)(void* facade) = (void (*)(void*))getRealOffset(ENCRYPTOFFSET("0x055CE9F8"));
+    if (_Send) _Send(facade);
+}
 
 namespace Camera$$WorldToScreen
 {
@@ -549,10 +551,6 @@ bool isFov(Vector3 vec1, Vector3 vec2, int radius)
 }
 
 
-
-
-
-
 void* GetClosestEnemy() {
     try {
         float shortestMetric = 120.0f;
@@ -593,7 +591,7 @@ void* GetClosestEnemy() {
             float distance = Vector3::Distance(localPos, playerPos);
             if (distance >= 120.0f) continue;
 
-            if (Vars.aimMode == 0) { // Aim Fov
+            if (Vars.aimMode == 0) {
                 Vector3 dir = Vector3::Normalized(playerPos - localPos);
                 float angle = Vector3::Angle(dir, cameraForward) * 100.0f;
                 ImVec2 screenPos = Camera$$WorldToScreen::Regular(playerPos);
@@ -604,7 +602,7 @@ void* GetClosestEnemy() {
                     closestEnemy = player;
                 }
             }
-            else if (Vars.aimMode == 1) { // Aim 180
+            else if (Vars.aimMode == 1) {
                 Vector3 dir = Vector3::Normalized(playerPos - localPos);
                 float angle = Vector3::Angle(dir, cameraForward) * 100.0f;
                 if (angle <= 180.0f && angle < shortestMetric) {
@@ -612,7 +610,7 @@ void* GetClosestEnemy() {
                     closestEnemy = player;
                 }
             }
-            else if (Vars.aimMode == 2) { // Aim 360
+            else if (Vars.aimMode == 2) {
                 if (distance < shortestMetric) {
                     shortestMetric = distance;
                     closestEnemy = player;
@@ -666,39 +664,6 @@ void *GetClosestEnemyForTelekill() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     void *GetClosestEnemyForfakeTelekill() {
     try {
         float shortestDistance = 300.0f;
@@ -741,53 +706,9 @@ void *GetClosestEnemyForTelekill() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static inline void CheckSession() {
     // login removed - no key required
 }
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 void ProcessAimbot() {
@@ -903,7 +824,6 @@ void* GetEnemyByShortestDistance(void* localPlayer, void* match) {
     for (int i = 0; i < values.size(); i++) {
         void *enemy = values[i];
 
-        // شروط الاستبعاد الأساسية
         if (!enemy || enemy == localPlayer ||
             game_sdk->get_isLocalTeam(enemy) ||
             game_sdk->get_IsDieing(enemy))
@@ -929,58 +849,14 @@ void* GetEnemyByShortestDistance(void* localPlayer, void* match) {
 }
 
 
-
-
-
-
-
-
    void get_players() {
         ImDrawList *draw_list = ImGui::GetBackgroundDrawList();
         int numberOfBots = 0;
         int numberOfPlayersAround = 0;
-          // AutoHookSilentFire();
         if (!draw_list)
             return;
         if (!Vars.Enable)
             return;
-
-
-        
-
-
-        
-
-
-
-
-
-       
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-       
-
-
-
-
-        
-
 
 
         /// Reset camera and player positions when both Underground & Blamyban are disabled
@@ -1011,7 +887,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
                 localPos.y = localOriginalY;
                 localOriginalY = 0.0f;
             } else {
-                localPos.y = 0.0f; // fallback
+                localPos.y = 0.0f;
             }
 
             Transform_INTERNAL_SetPosition(localTF, Vvector3(localPos.x, localPos.y, localPos.z));
@@ -1057,7 +933,6 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
 
 
         
-
         try {
             if (Vars.Aimbot) {
                 ProcessAimbot();
@@ -1067,37 +942,59 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
     if (!current_Match)
         return;
 
-
-
-
-
-
     void *local_player = game_sdk->GetLocalPlayer(current_Match);
     if (!local_player)
         return;
 
-
-
-
- 
     if (Vars.TeleportToMark) {
         // RunSmartAttackMerg(local_player);
     }
 
+    // ─────────────────────────────────────────────────────────
+    // FLY ALT — บินขึ้นสูงๆทะลุทุกอย่าง ไม่หยุดจนกว่าจะปิด
+    // ทุก frame จะเพิ่ม Y ขึ้น 0.35f (ผ่านกำแพง/พื้น)
+    // ─────────────────────────────────────────────────────────
+    if (Vars.flyaltura) {
+        void* localTF = game_sdk->Component_GetTransform(local_player);
+        if (localTF) {
+            Vector3 pos = game_sdk->get_position(localTF);
+            pos.y += 0.35f;
+            Transform_INTERNAL_SetPosition(localTF, Vvector3(pos.x, pos.y, pos.z));
+        }
+    }
 
+    // ─────────────────────────────────────────────────────────
+    // FLY V2 — พุ่งขึ้นอย่างรวดเร็ว ทุก 0.001s
+    // ─────────────────────────────────────────────────────────
+    if (Vars.FlyV2) {
+        static clock_t _flyv2Last = 0;
+        clock_t _flyv2Now = clock();
+        float _flyv2Elapsed = (float)(_flyv2Now - _flyv2Last) / CLOCKS_PER_SEC;
+        if (_flyv2Elapsed >= 0.001f) {
+            void* localTF = game_sdk->Component_GetTransform(local_player);
+            if (localTF) {
+                Vector3 pos = game_sdk->get_position(localTF);
+                pos.y += 3.5f;
+                Transform_INTERNAL_SetPosition(localTF, Vvector3(pos.x, pos.y, pos.z));
+            }
+            _flyv2Last = _flyv2Now;
+        }
+    }
 
+    // ─────────────────────────────────────────────────────────
+    // FLY GLIDER — เรียก StartParachute ทันทีที่กดเปิด
+    // จะพยายาม trigger ร่มชูชีพ 1 ครั้งตอน toggle ON
+    // ─────────────────────────────────────────────────────────
+    {
+        static bool _gliderFired = false;
+        if (!Vars.FlyGlider) {
+            _gliderFired = false;
+        } else if (!_gliderFired) {
+            ForceStartParachute(local_player);
+            _gliderFired = true;
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-    
    if (Vars.MagnetEnemy) {
     void* localTransform = game_sdk->Component_GetTransform(local_player);
     if (localTransform) {
@@ -1108,8 +1005,8 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
 
         if (players) {
 
-            auto values = players->getValues(); // FIX
-            int count = values.size();        // FIX
+            auto values = players->getValues();
+            int count = values.size();
 
             for (int i = 0; i < count; i++) {
                 void *enemy = values[i];
@@ -1144,32 +1041,21 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
     void* PlayerAttributes = *(void**)((uint64_t)local_player + 0x708);
     if (!PlayerAttributes)
         return;
-
     
 
             Dictionary<uint8_t *, void **> *players = *(Dictionary<uint8_t *, void **> **)((long)current_Match + 0x148);
             if (!players)
                 return;
 
-             
-
    
-
-
-
             void *camera = game_sdk->get_camera();
             if (!camera)
                 return;
 
-
-            
-
-
-            // One-shot Telekill: runs once when Telekill turns ON, then stops until you turn it OFF and ON again
-            static bool _tk_fired = false;  // persists across frames
+            // One-shot Telekill
+            static bool _tk_fired = false;
 
 if (!Vars.Telekill) {
-    // switch OFF -> re-arm
     _tk_fired = false;
 } 
 else if (!_tk_fired) 
@@ -1185,13 +1071,12 @@ else if (!_tk_fired)
             Vector3 pos = Transform_INTERNAL_GetPosition(enemy_tf);
             Transform_INTERNAL_SetPosition(local_tf, Vvector3(pos.x, pos.y, pos.z));
 
-            _tk_fired = true; // consumed this ON toggle
+            _tk_fired = true;
         }
     }
 }
 
 
-// ================= FAKE TELEKILL =================
 // ================= FAKE TELEKILL =================
 if (Vars.fakeTelekill)
 {
@@ -1206,7 +1091,6 @@ if (Vars.fakeTelekill)
             {
                 Vector3 enemyPos = tanghinh::Transform_GetPosition(enemyTransform);
 
-                // ignore invalid positions
                 if (!((enemyPos.x == 0 && enemyPos.y == 0 && enemyPos.z == 0) ||
                       enemyPos.y > 300.0f || enemyPos.y < -30.0f))
                 {
@@ -1248,7 +1132,6 @@ if (Vars.TelekillSliderEnabled && local_player != nullptr)
     }
 }
 // -------------------------------------------------------
-
 
 
             for (int u = 0; u < players->getValues().size(); u++) {
@@ -1296,11 +1179,8 @@ if (Vars.TelekillSliderEnabled && local_player != nullptr)
         ImVec2 startPos = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, 0.0f);
         ImVec2 endPos = ImVec2(rect.GetCenter().x, rect.Min.y);
 
-        // 1. رسم "التوهج" (Glow) - خطوط عريضة شفافة تعطي إحساس الضوء
-        draw_list->AddLine(startPos, endPos, ImColor(255, 255, 255, 40), 4.5f); // توهج خارجي عريض
-        draw_list->AddLine(startPos, endPos, ImColor(255, 255, 255, 80), 2.5f); // توهج داخلي متوسط
-
-        // 2. الخط الأساسي - أبيض ناصع جداً وقوي في المنتصف
+        draw_list->AddLine(startPos, endPos, ImColor(255, 255, 255, 40), 4.5f);
+        draw_list->AddLine(startPos, endPos, ImColor(255, 255, 255, 80), 2.5f);
         draw_list->AddLine(startPos, endPos, ImColor(255, 255, 255, 255), 1.2f);
     }
                     
@@ -1429,7 +1309,6 @@ if (Vars.TelekillSliderEnabled && local_player != nullptr)
                     }
                 }
             }
-
 
 
 
