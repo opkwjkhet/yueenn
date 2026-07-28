@@ -168,6 +168,12 @@ bool antiban(void* instance) {
     return false;
 }
 
+// ── SpeedTime hook — Time.get_timeScale ──
+// return Vars.SpeedTimeMult instead of 1.0 (ไม่ตัดเน็ต เพราะยังคง server tick ปกติ)
+float HOOK_TimeScale(void* _this) {
+    return Vars.SpeedTime ? Vars.SpeedTimeMult : 1.0f;
+}
+
 
 
 - (void)saveSettings {
@@ -821,6 +827,33 @@ bool antiban(void* instance) {
     }
 }
 
+// ── เร่งเวลาเกม ── scan float 1.0 แล้วเขียน multiplier
+// (เน็ตไม่ตัดเพราะแก้เฉพาะ client-side time scale)
+- (void)toggleSpeedTime:(BOOL)enable multiplier:(float)mult {
+    static dispatch_once_t onceToken;
+    static vector<void*> results;
+
+    JRMemoryEngine *engine = new JRMemoryEngine(mach_task_self());
+    AddrRange range = {0x100000000, 0x160000000};
+
+    if (enable) {
+        dispatch_once(&onceToken, ^{
+            float search = 1.0f;
+            engine->JRScanMemory(range, &search, JR_Search_Type_Float);
+            results = engine->getAllResults();
+        });
+        for (int i = 0; i < (int)results.size(); i++)
+            engine->JRWriteMemory((unsigned long long)(results[i]), &mult, JR_Search_Type_Float);
+    } else {
+        float restore = 1.0f;
+        for (int i = 0; i < (int)results.size(); i++)
+            engine->JRWriteMemory((unsigned long long)(results[i]), &restore, JR_Search_Type_Float);
+        onceToken = 0;
+        results.clear();
+    }
+    delete engine;
+}
+
 - (void)toggleScope:(BOOL)enable {
     static dispatch_once_t onceToken;
     static vector<void*> results;
@@ -966,13 +999,18 @@ style.IndentSpacing  = 14.0f;
     CGFloat w = [UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.width;
     CGFloat h = [UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.height;
     self.view = [[MTKView alloc] initWithFrame:CGRectMake(0, 0, w, h)];
-void* address[] = {
-    (void*)getRealOffset(ENCRYPTOFFSET("0x44C752C")),
-    };
-    void* function[] = {
-        (void*)Guest,
-    };
-    hook(address, function, 1);
+    // ── hook Guest (reset guest old) ──
+    {
+        void* addr[] = { (void*)getRealOffset(ENCRYPTOFFSET("0x44C752C")) };
+        void* fn[]   = { (void*)Guest };
+        hook(addr, fn, 1);
+    }
+    // ── hook Time.get_timeScale ── ทำ SpeedTime ทำงาน
+    {
+        void* addr[] = { (void*)getRealOffset(ENCRYPTOFFSET("0x916AEB4")) };
+        void* fn[]   = { (void*)HOOK_TimeScale };
+        hook(addr, fn, 1);
+    }
 
 }
 - (void)viewDidLoad {
@@ -1166,6 +1204,43 @@ void* address[] = {
                     ImGui::SliderFloat(ENCRYPT("FOV Radius"), &Vars.AimFov, 0.00f, 500.00f, "%.0f");
                     ImGui::PopItemWidth();
 
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    SectionHeader("— AIM EXTRA");
+
+                    // ── AIM MAGNET ──────────────────────────────
+                    // ดูดศัตรูในรัศมี 7m เข้าหาตัวเรา
+                    ImGui::Checkbox(ENCRYPT("AIM MAGNET"), &Vars.MagnetEnemy);
+                    if (Vars.MagnetEnemy) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.94f, 0.12f, 0.12f, 1.0f));
+                        ImGui::Text("[ON]");
+                        ImGui::PopStyleColor();
+                    }
+
+                    // ── AIM MANAGER ─────────────────────────────
+                    // snap aim ไปศัตรูใกล้สุดทุก frame (ไม่ต้องเปิด aimbot)
+                    ImGui::Checkbox(ENCRYPT("AIM MANAGER"), &Vars.AimManager);
+                    if (Vars.AimManager) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.20f, 0.80f, 0.20f, 1.0f));
+                        ImGui::Text("[LOCKED]");
+                        ImGui::PopStyleColor();
+                    }
+
+                    // ── AIMKILL TIMER ───────────────────────────
+                    // teleport ไปหาศัตรูอัตโนมัติทุก N วินาที
+                    ImGui::Checkbox(ENCRYPT("AIMKILL TIMER"), &Vars.AimKillTimer);
+                    if (Vars.AimKillTimer) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.94f, 0.12f, 0.12f, 1.0f));
+                        ImGui::Text("[HUNTING]");
+                        ImGui::PopStyleColor();
+                        ImGui::PushItemWidth(160);
+                        ImGui::SliderFloat(ENCRYPT("Kill Delay (s)"), &Vars.AimKillTimerDelay, 0.1f, 3.0f, "%.1f");
+                        ImGui::PopItemWidth();
+                    }
+
                     ImGui::Separator();
                     ImGui::EndTabItem();
                 }
@@ -1240,6 +1315,48 @@ void* address[] = {
                     ImGui::Checkbox(ENCRYPT("Ghost"), &Vars.ShowGhostButton);
                     if (Vars.ShowGhostButton) { if (!self.ghostButtonView) [self ghostModeUI]; }
                     else if (self.ghostButtonView) { [self.ghostButtonView removeFromSuperview]; self.ghostButtonView = nil; }
+
+                    // ── เร่งเวลาเกม ────────────────────────────
+                    // เร่ง client-side time scale (เน็ตไม่ตัด)
+                    if (ImGui::Checkbox(ENCRYPT("Speed Time"), &Vars.SpeedTime))
+                        [self toggleSpeedTime:Vars.SpeedTime multiplier:Vars.SpeedTimeMult];
+                    if (Vars.SpeedTime) {
+                        ImGui::PushItemWidth(160);
+                        if (ImGui::SliderFloat(ENCRYPT("Time x"), &Vars.SpeedTimeMult, 1.0f, 5.0f, "%.1f"))
+                            [self toggleSpeedTime:YES multiplier:Vars.SpeedTimeMult];
+                        ImGui::PopItemWidth();
+                    }
+
+                    // ── GO TELEPORT ─────────────────────────────
+                    // มุดลงดินเล็กน้อย + ไหลไปข้างหน้าตามทิศกล้อง
+                    ImGui::Checkbox(ENCRYPT("GO TELEPORT"), &Vars.GoTeleport);
+                    if (Vars.GoTeleport) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.20f, 0.80f, 0.20f, 1.0f));
+                        ImGui::Text("[GLIDING]");
+                        ImGui::PopStyleColor();
+                        ImGui::PushItemWidth(160);
+                        ImGui::SliderFloat(ENCRYPT("Speed##gt"), &Vars.GoTeleportSpeed, 0.05f, 1.5f, "%.2f");
+                        ImGui::PopItemWidth();
+                    }
+
+                    // ── BIG BOOMS ───────────────────────────────
+                    // ระเบิดออกจากตัวเราทุก interval กระแทกศัตรูในรัศมี
+                    ImGui::Checkbox(ENCRYPT("BIG BOOMS"), &Vars.BigBooms);
+                    if (Vars.BigBooms) {
+                        ImGui::SameLine();
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.55f, 0.0f, 1.0f));
+                        ImGui::Text("[BOOM!]");
+                        ImGui::PopStyleColor();
+                        ImGui::PushItemWidth(160);
+                        ImGui::SliderFloat(ENCRYPT("Radius##bb"),   &Vars.BigBoomsRadius,   1.0f, 20.0f, "%.0f");
+                        ImGui::SliderFloat(ENCRYPT("Interval##bb"), &Vars.BigBoomsInterval, 0.1f,  2.0f, "%.1f");
+                        ImGui::PopItemWidth();
+                    }
+
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    SectionHeader("— TELEPORT");
 
                     ImGui::Checkbox(ENCRYPT("Teleport Player"), &Vars.Telekill1);
                     if (Vars.Telekill1) { if (!self.telekillButtonView) [self telekillModeUI]; }
