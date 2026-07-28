@@ -182,6 +182,24 @@ enum EFireType {
             Vector3 LockedPos = Vector3::zero(); 
 
         bool ResetGuest = false;  // hook get_ResetGuest @ 0x4DE1380
+
+        // ── AIM MAGNET (MagnetEnemy already exists below) ──
+        // ── AIM MANAGER ──
+        bool AimManager = false;         // snap aim to closest enemy every frame
+        // ── AIMKILL TIMER ──
+        bool AimKillTimer = false;       // auto-teleport to closest enemy on timer
+        float AimKillTimerDelay = 0.4f;  // seconds between kill
+        // ── เร่งเวลาเกม ──
+        bool SpeedTime = false;
+        float SpeedTimeMult = 2.0f;      // ตัวคูณ timeScale (1.0 = ปกติ)
+        // ── GO TELEPORT ──
+        bool GoTeleport = false;         // มุดดิน + ไหลไปข้างหน้า
+        float GoTeleportSpeed = 0.25f;   // ความเร็วไหล (หน่วยต่อ frame)
+        // ── BIG BOOMS ──
+        bool BigBooms = false;           // ระเบิดออกจากตัวเราทุก interval
+        float BigBoomsRadius = 5.0f;     // รัศมีระเบิด (เมตร)
+        float BigBoomsInterval = 0.35f;  // วินาทีต่อครั้ง
+
         bool b_SuperFly = false;
             bool ShowZBBButton = false;
             bool ShowZBBBBBBBBBBBBButton = false;
@@ -992,6 +1010,132 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         } else if (!_gliderFired) {
             ForceStartParachute(local_player);
             _gliderFired = true;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // AIM MANAGER — snap aim to closest enemy every frame
+    // ทำงานโดยไม่ต้องเปิด Aimbot; ล็อคหัวศัตรูใกล้สุดตลอด
+    // ─────────────────────────────────────────────────────────
+    if (Vars.AimManager) {
+        void* closestMgr = GetEnemyByShortestDistance(local_player, current_Match);
+        if (closestMgr) {
+            Vector3 enemyHead = GetHeadPosition(closestMgr);
+            Vector3 camPos    = CameraMain(local_player);
+            if (enemyHead != Vector3::zero() && camPos != Vector3::zero()) {
+                Quaternion rot = GetRotationToTheLocation(enemyHead, 0.05f, camPos);
+                game_sdk->set_aim(local_player, rot);
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // AIMKILL TIMER — teleport to closest enemy every N seconds
+    // ─────────────────────────────────────────────────────────
+    {
+        static clock_t _atkLast = 0;
+        if (Vars.AimKillTimer) {
+            clock_t _atkNow = clock();
+            float _atkElapsed = (float)(_atkNow - _atkLast) / CLOCKS_PER_SEC;
+            if (_atkElapsed >= Vars.AimKillTimerDelay) {
+                void* enemy = GetClosestEnemyForTelekill();
+                if (enemy) {
+                    void* enemyTF = game_sdk->Component_GetTransform(enemy);
+                    void* localTF = game_sdk->Component_GetTransform(local_player);
+                    if (enemyTF && localTF) {
+                        Vector3 pos = Transform_INTERNAL_GetPosition(enemyTF);
+                        Transform_INTERNAL_SetPosition(localTF,
+                            Vvector3(pos.x + 0.5f, pos.y, pos.z + 0.5f));
+                    }
+                }
+                _atkLast = _atkNow;
+            }
+        } else {
+            _atkLast = 0;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // GO TELEPORT — มุดลงดินเล็กน้อย + ไหลไปข้างหน้าตามทิศกล้อง
+    // ─────────────────────────────────────────────────────────
+    {
+        static bool _gtSunk = false;
+        if (Vars.GoTeleport) {
+            void* localTF = game_sdk->Component_GetTransform(local_player);
+            void* cam     = game_sdk->get_camera();
+            void* camTF   = cam ? game_sdk->Component_GetTransform(cam) : nullptr;
+            if (localTF) {
+                if (!_gtSunk) {
+                    Vector3 pos = game_sdk->get_position(localTF);
+                    pos.y -= 1.5f; // มุดลงดินเล็กน้อย
+                    Transform_INTERNAL_SetPosition(localTF, Vvector3(pos.x, pos.y, pos.z));
+                    _gtSunk = true;
+                }
+                if (camTF) {
+                    Vector3 fwd = game_sdk->GetForward(camTF);
+                    fwd.y = 0.0f; // เคลื่อนแนวนอนเท่านั้น
+                    float len = fwd.x * fwd.x + fwd.z * fwd.z;
+                    if (len > 0.0001f) {
+                        len = sqrt(len);
+                        fwd.x /= len; fwd.z /= len;
+                    }
+                    Vector3 pos = game_sdk->get_position(localTF);
+                    pos.x += fwd.x * Vars.GoTeleportSpeed;
+                    pos.z += fwd.z * Vars.GoTeleportSpeed;
+                    Transform_INTERNAL_SetPosition(localTF, Vvector3(pos.x, pos.y, pos.z));
+                }
+            }
+        } else {
+            _gtSunk = false;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // BIG BOOMS — ระเบิดออกจากตัวเราทุก interval
+    // ศัตรูในรัศมีถูกกระแทกออกไปพร้อม Y พุ่งขึ้น (blast effect)
+    // ─────────────────────────────────────────────────────────
+    {
+        static clock_t _bbLast = 0;
+        if (Vars.BigBooms) {
+            clock_t _bbNow = clock();
+            float _bbElapsed = (float)(_bbNow - _bbLast) / CLOCKS_PER_SEC;
+            if (_bbElapsed >= Vars.BigBoomsInterval) {
+                void* localTF = game_sdk->Component_GetTransform(local_player);
+                if (localTF) {
+                    Vector3 myPos = game_sdk->get_position(localTF);
+                    Dictionary<uint8_t*, void**>* boomPlayers =
+                        *(Dictionary<uint8_t*, void**>**)((uintptr_t)current_Match + 0x148);
+                    if (boomPlayers) {
+                        auto bvals = boomPlayers->getValues();
+                        for (int bi = 0; bi < (int)bvals.size(); bi++) {
+                            void* enemy = bvals[bi];
+                            if (!enemy || enemy == local_player) continue;
+                            if (game_sdk->get_isLocalTeam(enemy)) continue;
+                            void* eTF = game_sdk->Component_GetTransform(enemy);
+                            if (!eTF) continue;
+                            Vector3 ePos = game_sdk->get_position(eTF);
+                            float dist = Vector3::Distance(myPos, ePos);
+                            if (dist <= Vars.BigBoomsRadius) {
+                                // ทิศออกจากเรา normalize
+                                float dx = ePos.x - myPos.x;
+                                float dz = ePos.z - myPos.z;
+                                float dlen = sqrt(dx*dx + dz*dz);
+                                if (dlen < 0.01f) { dx = 1.0f; dz = 0.0f; dlen = 1.0f; }
+                                dx /= dlen; dz /= dlen;
+                                // กระแทกออก + ลอยขึ้น
+                                Transform_INTERNAL_SetPosition(eTF, Vvector3(
+                                    ePos.x + dx * 4.5f,
+                                    ePos.y + 5.0f,
+                                    ePos.z + dz * 4.5f
+                                ));
+                            }
+                        }
+                    }
+                }
+                _bbLast = _bbNow;
+            }
+        } else {
+            _bbLast = 0;
         }
     }
 
