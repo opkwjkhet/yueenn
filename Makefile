@@ -29,7 +29,7 @@ IMGUI/imgui_impl_metal.mm \
 hook/hook.c \
 hook/mach_excServer.c
 
-# ✅ CFLAGS — เพิ่ม -Wno-error เข้าไป!
+
 VIGAR_CFLAGS = -fobjc-arc \
 -Wall \
 -Wno-error \
@@ -40,7 +40,7 @@ VIGAR_CFLAGS = -fobjc-arc \
 -Wno-uninitialized-const-pointer \
 -fvisibility=hidden
 
-# ✅ CCFLAGS — เพิ่ม -Wno-error เข้าไป!
+
 VIGAR_CCFLAGS = -std=c++17 \
 -fno-rtti \
 -DNDEBUG \
