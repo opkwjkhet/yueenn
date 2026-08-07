@@ -348,20 +348,13 @@ static void SwapWeapon(void *player, int POFFNNMOOBM, bool GDKLMFLNNGM) {
         _Transform_INTERNAL_SetPosition(player, inn);
     }
 
-// ─────────────────────────────────────────────────────────────
-// FLY GLIDER  — offset 0x6427B40 (StartParachute override)
-// Calling this on the local player's flight-state object forces
-// the parachute to open wherever the player is standing.
-// ─────────────────────────────────────────────────────────────
+
 static void ForceStartParachute(void* player) {
     void (*_StartParachute)(void* player) = (void (*)(void*))getRealOffset(ENCRYPTOFFSET("0x6427B40"));
     if (_StartParachute) _StartParachute(player);
 }
 
-// ─────────────────────────────────────────────────────────────
-// GameFacade_Send  — user-supplied offset 0x055CE9F8
-// Call with the local GameFacade instance to flush pending packets.
-// ─────────────────────────────────────────────────────────────
+
 static void GameFacade_Send(void* facade) {
     void (*_Send)(void* facade) = (void (*)(void*))getRealOffset(ENCRYPTOFFSET("0x055CE9F8"));
     if (_Send) _Send(facade);
@@ -877,14 +870,14 @@ void* GetEnemyByShortestDistance(void* localPlayer, void* match) {
             return;
 
 
-        /// Reset camera and player positions when both Underground & Blamyban are disabled
+      
 if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
     cameraAdjusted = false;
 
     void *match = game_sdk->Curent_Match();
     if (!match) return;
 
-    // ================= Restore camera =================
+
     void *camera = game_sdk->get_camera();
     void *camTF = camera ? game_sdk->Component_GetTransform(camera) : nullptr;
 
@@ -894,7 +887,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         Transform_INTERNAL_SetPosition(camTF, Vvector3(camPos.x, camPos.y, camPos.z));
     }
 
-    // ================= Restore local player =================
+
     void *local = game_sdk->GetLocalPlayer(match);
     if (local) {
         void *localTF = game_sdk->Component_GetTransform(local);
@@ -912,7 +905,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         }
     }
 
-    // ================= Restore enemies =================
+
     Dictionary<uint8_t *, void **> *players =
         *(Dictionary<uint8_t *, void **> **)((uintptr_t)match + 0x148);
 
@@ -968,10 +961,6 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         // RunSmartAttackMerg(local_player);
     }
 
-    // ─────────────────────────────────────────────────────────
-    // FLY ALT — บินขึ้นสูงๆทะลุทุกอย่าง ไม่หยุดจนกว่าจะปิด
-    // ทุก frame จะเพิ่ม Y ขึ้น 0.35f (ผ่านกำแพง/พื้น)
-    // ─────────────────────────────────────────────────────────
     if (Vars.flyaltura) {
         void* localTF = game_sdk->Component_GetTransform(local_player);
         if (localTF) {
@@ -981,9 +970,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         }
     }
 
-    // ─────────────────────────────────────────────────────────
-    // FLY V2 — พุ่งขึ้นอย่างรวดเร็ว ทุก 0.001s
-    // ─────────────────────────────────────────────────────────
+ 
     if (Vars.FlyV2) {
         static clock_t _flyv2Last = 0;
         clock_t _flyv2Now = clock();
@@ -999,11 +986,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         }
     }
 
-    // ─────────────────────────────────────────────────────────
-    // FLY GLIDER — เรียก StartParachute ทันทีที่กดเปิด
-    // จะพยายาม trigger ร่มชูชีพ 1 ครั้งตอน toggle ON
-    // ─────────────────────────────────────────────────────────
-    {
+    
         static bool _gliderFired = false;
         if (!Vars.FlyGlider) {
             _gliderFired = false;
@@ -1013,10 +996,6 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         }
     }
 
-    // ─────────────────────────────────────────────────────────
-    // AIM MANAGER — snap aim to closest enemy every frame
-    // ทำงานโดยไม่ต้องเปิด Aimbot; ล็อคหัวศัตรูใกล้สุดตลอด
-    // ─────────────────────────────────────────────────────────
     if (Vars.AimManager) {
         void* closestMgr = GetEnemyByShortestDistance(local_player, current_Match);
         if (closestMgr) {
@@ -1029,10 +1008,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         }
     }
 
-    // ─────────────────────────────────────────────────────────
-    // AIMKILL TIMER — teleport to closest enemy every N seconds
-    // ─────────────────────────────────────────────────────────
-    {
+   
         static clock_t _atkLast = 0;
         if (Vars.AimKillTimer) {
             clock_t _atkNow = clock();
@@ -1055,10 +1031,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         }
     }
 
-    // ─────────────────────────────────────────────────────────
-    // GO TELEPORT — มุดลงดินเล็กน้อย + ไหลไปข้างหน้าตามทิศกล้อง
-    // ─────────────────────────────────────────────────────────
-    {
+      {
         static bool _gtSunk = false;
         if (Vars.GoTeleport) {
             void* localTF = game_sdk->Component_GetTransform(local_player);
@@ -1090,10 +1063,7 @@ if (!Vars.Underground && !Vars.Blamyban && cameraAdjusted) {
         }
     }
 
-    // ─────────────────────────────────────────────────────────
-    // BIG BOOMS — ระเบิดออกจากตัวเราทุก interval
-    // ศัตรูในรัศมีถูกกระแทกออกไปพร้อม Y พุ่งขึ้น (blast effect)
-    // ─────────────────────────────────────────────────────────
+
     {
         static clock_t _bbLast = 0;
         if (Vars.BigBooms) {
@@ -1221,7 +1191,7 @@ else if (!_tk_fired)
 }
 
 
-// ================= FAKE TELEKILL =================
+
 if (Vars.fakeTelekill)
 {
     void* enemy = GetClosestEnemyForfakeTelekill();
@@ -1250,7 +1220,7 @@ if (Vars.fakeTelekill)
 }
 
 
-// ================= TELEKILL SLIDER =================
+
 if (Vars.TelekillSliderEnabled && local_player != nullptr)
 {
     void* match = game_sdk->Curent_Match();
@@ -1275,7 +1245,7 @@ if (Vars.TelekillSliderEnabled && local_player != nullptr)
         }
     }
 }
-// -------------------------------------------------------
+
 
 
             for (int u = 0; u < players->getValues().size(); u++) {
