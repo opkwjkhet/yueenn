@@ -999,13 +999,12 @@ style.IndentSpacing  = 14.0f;
     CGFloat w = [UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.width;
     CGFloat h = [UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.height;
     self.view = [[MTKView alloc] initWithFrame:CGRectMake(0, 0, w, h)];
-    // ── hook Guest (reset guest old) ──
+    // ── hook Guest
     {
         void* addr[] = { (void*)getRealOffset(ENCRYPTOFFSET("0x44C752C")) };
         void* fn[]   = { (void*)Guest };
         hook(addr, fn, 1);
     }
-    // ── hook Time.get_timeScale ── ทำ SpeedTime ทำงาน
     {
         void* addr[] = { (void*)getRealOffset(ENCRYPTOFFSET("0x916AEB4")) };
         void* fn[]   = { (void*)HOOK_TimeScale };
@@ -1144,9 +1143,7 @@ style.IndentSpacing  = 14.0f;
 
             if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_FittingPolicyScroll))
             {
-                // ══════════════════════════════════════════
-                // TAB 1 — ESP
-                // ══════════════════════════════════════════
+        
                 if (ImGui::BeginTabItem("  ESP  "))
                 {
                     ImGui::Spacing();
@@ -1170,9 +1167,7 @@ style.IndentSpacing  = 14.0f;
                     ImGui::EndTabItem();
                 }
 
-                // ══════════════════════════════════════════
-                // TAB 2 — AIMBOT
-                // ══════════════════════════════════════════
+       
                 if (ImGui::BeginTabItem("  AIMBOT  "))
                 {
                     ImGui::Spacing();
@@ -1208,8 +1203,7 @@ style.IndentSpacing  = 14.0f;
                     ImGui::Separator();
                     SectionHeader("— AIM EXTRA");
 
-                    // ── AIM MAGNET ──────────────────────────────
-                    // ดูดศัตรูในรัศมี 7m เข้าหาตัวเรา
+                
                     ImGui::Checkbox(ENCRYPT("AIM MAGNET"), &Vars.MagnetEnemy);
                     if (Vars.MagnetEnemy) {
                         ImGui::SameLine();
@@ -1218,8 +1212,6 @@ style.IndentSpacing  = 14.0f;
                         ImGui::PopStyleColor();
                     }
 
-                    // ── AIM MANAGER ─────────────────────────────
-                    // snap aim ไปศัตรูใกล้สุดทุก frame (ไม่ต้องเปิด aimbot)
                     ImGui::Checkbox(ENCRYPT("AIM MANAGER"), &Vars.AimManager);
                     if (Vars.AimManager) {
                         ImGui::SameLine();
@@ -1228,8 +1220,6 @@ style.IndentSpacing  = 14.0f;
                         ImGui::PopStyleColor();
                     }
 
-                    // ── AIMKILL TIMER ───────────────────────────
-                    // teleport ไปหาศัตรูอัตโนมัติทุก N วินาที
                     ImGui::Checkbox(ENCRYPT("AIMKILL TIMER"), &Vars.AimKillTimer);
                     if (Vars.AimKillTimer) {
                         ImGui::SameLine();
@@ -1245,9 +1235,7 @@ style.IndentSpacing  = 14.0f;
                     ImGui::EndTabItem();
                 }
 
-                // ══════════════════════════════════════════
-                // TAB 3 — MSL
-                // ══════════════════════════════════════════
+        
                 if (ImGui::BeginTabItem("  MSL  "))
                 {
                     ImGui::Spacing();
@@ -1263,8 +1251,7 @@ style.IndentSpacing  = 14.0f;
                     ImGui::Spacing();
                     SectionHeader("— FLY");
 
-                    // ── FLY ALT ──────────────────────────────────
-                    // บินขึ้นสูงๆทะลุทุกอย่าง ไม่กดปิดไม่หยุด
+             
                     ImGui::Checkbox(ENCRYPT("FLY ALT"), &Vars.flyaltura);
                     if (Vars.flyaltura) {
                         ImGui::SameLine();
@@ -1273,8 +1260,7 @@ style.IndentSpacing  = 14.0f;
                         ImGui::PopStyleColor();
                     }
 
-                    // ── FLY V2 ───────────────────────────────────
-                    // พุ่งขึ้นด้วยความเร็ว 0.001s
+              
                     ImGui::Checkbox(ENCRYPT("FLY V2"), &Vars.FlyV2);
                     if (Vars.FlyV2) {
                         ImGui::SameLine();
@@ -1283,8 +1269,7 @@ style.IndentSpacing  = 14.0f;
                         ImGui::PopStyleColor();
                     }
 
-                    // ── FLY GLIDER ───────────────────────────────
-                    // กดเปิด = ร่มโพล่มาทันที (StartParachute)
+      
                     if (ImGui::Checkbox(ENCRYPT("FLY GLIDER"), &Vars.FlyGlider)) {
                         // toggle resets the one-shot flag automatically in get_players()
                     }
@@ -1315,9 +1300,6 @@ style.IndentSpacing  = 14.0f;
                     ImGui::Checkbox(ENCRYPT("Ghost"), &Vars.ShowGhostButton);
                     if (Vars.ShowGhostButton) { if (!self.ghostButtonView) [self ghostModeUI]; }
                     else if (self.ghostButtonView) { [self.ghostButtonView removeFromSuperview]; self.ghostButtonView = nil; }
-
-                    // ── เร่งเวลาเกม ────────────────────────────
-                    // เร่ง client-side time scale (เน็ตไม่ตัด)
                     if (ImGui::Checkbox(ENCRYPT("Speed Time"), &Vars.SpeedTime))
                         [self toggleSpeedTime:Vars.SpeedTime multiplier:Vars.SpeedTimeMult];
                     if (Vars.SpeedTime) {
@@ -1327,8 +1309,7 @@ style.IndentSpacing  = 14.0f;
                         ImGui::PopItemWidth();
                     }
 
-                    // ── GO TELEPORT ─────────────────────────────
-                    // มุดลงดินเล็กน้อย + ไหลไปข้างหน้าตามทิศกล้อง
+              
                     ImGui::Checkbox(ENCRYPT("GO TELEPORT"), &Vars.GoTeleport);
                     if (Vars.GoTeleport) {
                         ImGui::SameLine();
@@ -1340,8 +1321,6 @@ style.IndentSpacing  = 14.0f;
                         ImGui::PopItemWidth();
                     }
 
-                    // ── BIG BOOMS ───────────────────────────────
-                    // ระเบิดออกจากตัวเราทุก interval กระแทกศัตรูในรัศมี
                     ImGui::Checkbox(ENCRYPT("BIG BOOMS"), &Vars.BigBooms);
                     if (Vars.BigBooms) {
                         ImGui::SameLine();
@@ -1370,9 +1349,7 @@ style.IndentSpacing  = 14.0f;
                     ImGui::EndTabItem();
                 }
 
-                // ══════════════════════════════════════════
-                // TAB 4 — EXTRA (Settings)
-                // ══════════════════════════════════════════
+                
                 if (ImGui::BeginTabItem("  EXTRA  "))
                 {
                     ImGui::Spacing();
